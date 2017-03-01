@@ -1,0 +1,13 @@
+{
+    "name": "vitexsoftware/flexipeehp-examples",
+    "description": "Description of project FlexiPeeHP Examples.",
+    "authors": [
+        {
+            "name": "Vitex",
+            "email": "info@vitexsoftware.cz"
+        }
+    ],
+    "require": {
+        "spoje.net/flexipeehp": "dev-master"
+    }
+}
