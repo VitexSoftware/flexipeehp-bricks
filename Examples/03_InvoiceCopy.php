@@ -59,7 +59,7 @@ function invoiceCopy($invoice, $extraValues = [])
 }
 echo "Please enter invoice ID ( one of https://demo.flexibee.eu/c/demo/faktura-vydana.json?detail=custom;id&limit=0 ) to copy:";
 $input     = fopen("php://stdin", "r");
-$invoiceID = fgets($input);
+$invoiceID = trim(fgets($input));
 fclose($input);
 if (is_numeric($invoiceID)) {
     $invoiceID = intval($invoiceID);
