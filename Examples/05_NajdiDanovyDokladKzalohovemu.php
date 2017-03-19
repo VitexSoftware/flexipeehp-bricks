@@ -11,13 +11,9 @@ namespace Example\FlexiPeeHP;
 
 include_once './config.php';
 include_once '../vendor/autoload.php';
-echo "Please enter invoice ID ( one of https://demo.flexibee.eu/c/demo/faktura-vydana.json?detail=custom;id&limit=0 ) to copy:";
-$input     = fopen("php://stdin", "r");
-$invoiceID = trim(fgets($input));
-fclose($input);
-if (is_numeric($invoiceID)) {
-    $invoiceID = intval($invoiceID);
-}
+include_once './common.php';
+
+$invoiceID = askForInvoiceID();
 
 /*
  * FlexiPeeHP Classes accept this form of initial identifier:
