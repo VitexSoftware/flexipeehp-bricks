@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "a148c184480c3a33c0c9621ede63e98e",
+    "content-hash": "d64cd7d0911c3189708bd84352d48d8e",
     "packages": [
         {
             "name": "pear/console_getopt",
@@ -55,20 +55,20 @@
         },
         {
             "name": "pear/mail",
-            "version": "1.3.0",
+            "version": "v1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/pear/Mail.git",
-                "reference": "8a7305cb507b460e03e55e0ac84c67c8358c9b44"
+                "reference": "9609ed5e42ac5b221dfd9af85de005c59d418ee7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/pear/Mail/zipball/8a7305cb507b460e03e55e0ac84c67c8358c9b44",
-                "reference": "8a7305cb507b460e03e55e0ac84c67c8358c9b44",
+                "url": "https://api.github.com/repos/pear/Mail/zipball/9609ed5e42ac5b221dfd9af85de005c59d418ee7",
+                "reference": "9609ed5e42ac5b221dfd9af85de005c59d418ee7",
                 "shasum": ""
             },
             "require": {
-                "pear/pear-core-minimal": "*",
+                "pear/pear-core-minimal": "~1.9",
                 "php": ">=5.2.1"
             },
             "require-dev": {
@@ -109,7 +109,7 @@
             ],
             "description": "Class that provides multiple interfaces for sending emails.",
             "homepage": "http://pear.php.net/package/Mail",
-            "time": "2016-01-31T21:32:18+00:00"
+            "time": "2017-04-11T17:27:29+00:00"
         },
         {
             "name": "pear/mail_mime",
@@ -262,12 +262,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Spoje-NET/FlexiPeeHP.git",
-                "reference": "6275cab89005d6237df0b7973f4125acb4e738c1"
+                "reference": "c790544e3d432a587ce6fe8aae14c5e49d27cd66"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Spoje-NET/FlexiPeeHP/zipball/6275cab89005d6237df0b7973f4125acb4e738c1",
-                "reference": "6275cab89005d6237df0b7973f4125acb4e738c1",
+                "url": "https://api.github.com/repos/Spoje-NET/FlexiPeeHP/zipball/c790544e3d432a587ce6fe8aae14c5e49d27cd66",
+                "reference": "c790544e3d432a587ce6fe8aae14c5e49d27cd66",
                 "shasum": ""
             },
             "require": {
@@ -299,20 +299,20 @@
                 }
             ],
             "description": "PHP Based Library for easy interaction with czech accounting system Flexibee.",
-            "time": "2017-02-27 23:01:41"
+            "time": "2017-05-08 14:37:08"
         },
         {
             "name": "vitexsoftware/ease-framework",
-            "version": "1.2.2",
+            "version": "1.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/VitexSoftware/EaseFramework.git",
-                "reference": "483311746c2d4e79b0a7587ee648fa071f9d37d1"
+                "reference": "8cfbb349ce343097412b532f602044fecf5894b4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VitexSoftware/EaseFramework/zipball/483311746c2d4e79b0a7587ee648fa071f9d37d1",
-                "reference": "483311746c2d4e79b0a7587ee648fa071f9d37d1",
+                "url": "https://api.github.com/repos/VitexSoftware/EaseFramework/zipball/8cfbb349ce343097412b532f602044fecf5894b4",
+                "reference": "8cfbb349ce343097412b532f602044fecf5894b4",
                 "shasum": ""
             },
             "require": {
@@ -354,7 +354,7 @@
             ],
             "description": "An PHP Framework for Ease of writing Applications",
             "homepage": "http://v.s.cz/ease.php",
-            "time": "2017-02-13T20:12:14+00:00"
+            "time": "2017-04-30T08:23:48+00:00"
         }
     ],
     "packages-dev": [],
