@@ -17,4 +17,13 @@ $invoiceID = askForInvoiceID();
 
 $invoice = new \FlexiPeeHP\FakturaVydana($invoiceID);
 
-\FlexiPeeHP\Priloha::saveToFile($object, '/tmp/');
+$attachment = \FlexiPeeHP\Priloha::getFirstAttachment($invoice);
+
+if (isset($attachment['id'])) {
+    if (\FlexiPeeHP\Priloha::saveToFile((int) $attachment['id'], '/tmp/')) {
+        $invoice->addStatusMessage(sprintf(_('Attachment %s was saved'),
+                $attachment['nazSoub']), 'success');
+    }
+} else {
+    $invoice->addStatusMessage(_('Invoice without attachment'));
+}

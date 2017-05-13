@@ -16,7 +16,7 @@ namespace Example\FlexiPeeHP;
 function askForInvoiceID()
 {
     $invoiceID = null;
-    echo "Please enter invoice ID ( one of https://demo.flexibee.eu/c/demo/faktura-vydana.json?detail=custom;id&limit=0 ) to copy:";
+    echo "Please enter invoice ID ( one of https://demo.flexibee.eu/c/demo/faktura-vydana.json?detail=custom;id&limit=0 ):";
     $input     = fopen("php://stdin", "r");
     $invoiceID = trim(fgets($input));
     fclose($input);
