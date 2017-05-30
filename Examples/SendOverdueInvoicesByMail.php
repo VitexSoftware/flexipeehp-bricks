@@ -2,6 +2,8 @@
 <?php
 /**
  * FlexiPeeHP - Example how to find overdue invoices
+ * 
+ * Requied FlexiBee license: BASIC
  *
  * @author     Vítězslav Dvořák <info@vitexsofware.cz>
  * @copyright  (G) 2017 Vitex Software
@@ -67,14 +69,14 @@ foreach (getOverdueInvoices($invoicer) as $invoice) {
         $invoicer->setMyKey($invoice['id']);
 
         $to      = $kontakt[0]['email'];
-        $subject = sprintf(_('Overdue invoice: %s - %s days'), $invoice['kod'],
+        $subject = sprintf(_('Overdue invoice notice: %s - %s days'), $invoice['kod'],
             poSplatnosti($invoice['datSplat']));
         $body    = sprintf(_('Please pay %s,-'), $invoice['sumCelkem']);
 
         if ($statuser->getDataValue('licenseVariant') == 'basic') {
             $mail = new \Ease\Mailer($to, $subject, $body);
-            $mail->addFile($invoicer->downloadInFormat('pdf', '/tmp/'));
-            $mail->addFile($invoicer->downloadInFormat('isdoc', '/tmp/'));
+            $mail->addFile($invoicer->downloadInFormat('pdf', '/tmp/'), \FlexiPeeHP\FlexiBeeRO::$formats['PDF']['content-type']);
+            $mail->addFile($invoicer->downloadInFormat('isdocx', '/tmp/'), \FlexiPeeHP\FlexiBeeRO::$formats['ISDOCX']['content-type']);
             $mail->send();
         } else {
             if ($invoicer->sendByMail($to, $subject, $body)) {
