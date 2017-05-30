@@ -12,10 +12,26 @@ namespace Example\FlexiPeeHP;
 include_once './config.php';
 include_once '../vendor/autoload.php';
 
-function getOverdueInvoices()
+/**
+ * Get Number of days overdue
+ *
+ * @param string $dueDate FlexiBee date
+ * @return int
+ */
+function poSplatnosti($dueDate)
 {
-    $invoicer = new \FlexiPeeHP\FakturaVydana();
+    return intval(date_diff(\FlexiPeeHP\FlexiBeeRO::flexiDateToDateTime($dueDate),
+            new \DateTime())->format('%a'));
+}
 
+/**
+ * Vrať faktury po splatnosti
+ *
+ * @param \FlexiPeeHP\FakturaVydana $invoicer
+ * @return array
+ */
+function getOverdueInvoices($invoicer)
+{
     $result                                  = null;
     $invoicer->defaultUrlParams['order']     = 'datVyst@A';
     $invoicer->defaultUrlParams['relations'] = 'adresar,kontakt';
@@ -29,6 +45,7 @@ function getOverdueInvoices()
         'specSym',
         'sumCelkem',
         'duzpPuv',
+        'datSplat',
         'datVyst'],
         "(stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false",
         'id');
@@ -38,30 +55,32 @@ function getOverdueInvoices()
     }
     return $result;
 }
-$firmer = new \FlexiPeeHP\Adresar();
+$statuser = new \FlexiPeeHP\Status();
+$invoicer = new \FlexiPeeHP\FakturaVydana();
+$firmer   = new \FlexiPeeHP\Adresar();
 
-foreach (getOverdueInvoices() as $invoice) {
+foreach (getOverdueInvoices($invoicer) as $invoice) {
     $kontakt = $firmer->getColumnsFromFlexibee(['nazev', 'email'],
         ['id' => $invoice['firma']]);
-    $firmer->addStatusMessage(implode(',', $kontakt[0]), 'success');
-    print_r($invoice);
 
     if (isset($kontakt[0]['email'])) {
-        $mail = new \Ease\Mailer($kontakt[0]['email'],
-            sprintf(_('Overdue invoice: %s'), $invoice['kod']),
-            sprintf(_('Please pay %s,-'), $invoice['sumCelkem']));
+        $invoicer->setMyKey($invoice['id']);
 
+        $to      = $kontakt[0]['email'];
+        $subject = sprintf(_('Overdue invoice: %s - %s days'), $invoice['kod'],
+            poSplatnosti($invoice['datSplat']));
+        $body    = sprintf(_('Please pay %s,-'), $invoice['sumCelkem']);
 
-        $pdfUrl    = 'faktura-vydana/'.urlencode($invoice['id']).'.pdf';
-        $pdfSaveTo = '/tmp/faktura-vydana-'.$invoice['id'].'.pdf';
-        file_put_contents($pdfSaveTo, file_get_contents($pdfUrl));
-        $mail->addFile($pdfSaveTo);
-
-        $isdocxUrl    = 'faktura-vydana/'.$invoice['id'].'.isdocx';
-        $isdocxSaveTo = '/tmp/faktura-vydana-'.$invoice['id'].'.isdocx';
-        file_put_contents($isdocxSaveTo, file_get_contents($isdocxUrl));
-
-        $mail->addFile($isdocxSaveTo);
-        $mail->send();
+        if ($statuser->getDataValue('licenseVariant') == 'basic') {
+            $mail = new \Ease\Mailer($to, $subject, $body);
+            $mail->addFile($invoicer->downloadInFormat('pdf', '/tmp/'));
+            $mail->addFile($invoicer->downloadInFormat('isdoc', '/tmp/'));
+            $mail->send();
+        } else {
+            if ($invoicer->sendByMail($to, $subject, $body)) {
+                $invoicer->addStatusMessage(spritnf(_('Message sent: %s to %s'),
+                        $subject, $to), 'mail');
+            }
+        }
     }
 }
