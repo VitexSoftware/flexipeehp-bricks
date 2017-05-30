@@ -26,6 +26,6 @@ $invoiceID = askForInvoiceID();
 
 $invoice = new \FlexiPeeHP\FakturaVydana($invoiceID);
 $pdfUrl  = $invoice->getEvidenceURL().'/'.urlencode($invoice).'.pdf';
-$saveTo  = $invoice->getEvidence().'-'.$invoice->getDataValue('id').'.pdf';
+$pdfSaveTo  = $invoice->getEvidence().'-'.$invoice->getDataValue('id').'.pdf';
 
-file_put_contents($saveTo, file_get_contents($pdfUrl));
+file_put_contents($pdfSaveTo, file_get_contents($pdfUrl));

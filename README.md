@@ -1,6 +1,9 @@
 # FlexiPeeHP-Examples
 
-Examples how to use FlexiPeeHP Library for FlexiBee
+Examples how to use [FlexiPeeHP](https://github.com/Spoje-NET/FlexiPeeHP) Library for FlexiBee
+
+Příklady použití knihovny [FlexiPeeHP](https://github.com/Spoje-NET/FlexiPeeHP) pro [FlexiBee](https://flexibee.eu/)
+
 
 How to run ?
 ------------

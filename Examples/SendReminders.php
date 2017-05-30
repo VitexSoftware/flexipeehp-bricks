@@ -1,7 +1,7 @@
 #!/usr/bin/php -f
 <?php
 /**
- * FlexiPeeHP - Example how to find overdue invoices
+ * FlexiPeeHP - Odeslat Upomínky ?
  *
  * @author     Vítězslav Dvořák <info@vitexsofware.cz>
  * @copyright  (G) 2017 Vitex Software
