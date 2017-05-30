@@ -80,7 +80,7 @@ foreach (getOverdueInvoices($invoicer) as $invoice) {
             $mail->send();
         } else {
             if ($invoicer->sendByMail($to, $subject, $body)) {
-                $invoicer->addStatusMessage(spritnf(_('Message sent: %s to %s'),
+                $invoicer->addStatusMessage(sprintf(_('Message sent: %s to %s'),
                         $subject, $to), 'mail');
             }
         }
