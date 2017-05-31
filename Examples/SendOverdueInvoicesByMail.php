@@ -76,7 +76,7 @@ foreach (getOverdueInvoices($invoicer) as $invoice) {
         if ($statuser->getDataValue('licenseVariant') == 'basic') {
             $mail = new \Ease\Mailer($to, $subject, $body);
             $mail->addFile($invoicer->downloadInFormat('pdf', '/tmp/'), \FlexiPeeHP\FlexiBeeRO::$formats['PDF']['content-type']);
-            $mail->addFile($invoicer->downloadInFormat('isdocx', '/tmp/'), \FlexiPeeHP\FlexiBeeRO::$formats['ISDOCX']['content-type']);
+            $mail->addFile($invoicer->downloadInFormat('isdocx', '/tmp/'), \FlexiPeeHP\FlexiBeeRO::$formats['ISDOCx']['content-type']);
             $mail->send();
         } else {
             if ($invoicer->sendByMail($to, $subject, $body)) {
