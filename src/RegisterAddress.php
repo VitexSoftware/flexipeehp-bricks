@@ -12,5 +12,5 @@ include_once './config.php';
 include_once '../vendor/autoload.php';
 include_once './common.php';
 
-$oPage->addItem(new StatusInfoBox());
+$oPage->addItem(new AddressRegisterForm());
 $oPage->draw();

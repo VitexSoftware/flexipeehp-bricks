@@ -23,5 +23,8 @@
             "Test\\FlexiPeeHP\\": "vendor/spoje.net/flexipeehp/tests/src/FlexiPeeHP",
             "Test\\": "testing/"
         }
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.3"
     }
 }

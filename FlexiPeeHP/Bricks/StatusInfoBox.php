@@ -1,19 +1,22 @@
 <?php
 /**
- * Description of SysFlexiBeeStatus.
+ * FlexiBee-Bricks
  *
  * @author vitex
  */
 
 namespace FlexiPeeHP\Bricks;
 
+/**
+ * 
+ */
 class StatusInfoBox extends \FlexiPeeHP\Company
 {
     /**
      * FlexiBee Status
      * @var array
      */
-    public $info = null;
+    public $info = [];
 
     /**
      * Try to connect to FlexiBee
@@ -21,7 +24,10 @@ class StatusInfoBox extends \FlexiPeeHP\Company
     public function __construct()
     {
         parent::__construct();
-        $this->info = $this->reindexArrayBy($this->getFlexiData(), 'dbNazev');
+        $infoRaw = $this->getFlexiData();
+        if (count($infoRaw)) {
+            $this->info = $this->reindexArrayBy($infoRaw, 'dbNazev');
+        }
     }
 
     /**
@@ -29,12 +35,12 @@ class StatusInfoBox extends \FlexiPeeHP\Company
      */
     public function draw()
     {
-        $myCompany = constant('FLEXIBEE_COMPANY');
+        $myCompany = $this->getCompany();
         if (array_key_exists($myCompany, $this->info)) {
-            $return = new \Ease\TWB\LinkButton(constant('FLEXIBEE_URL').'/c/'.$myCompany,
+            $return = new \Ease\TWB\LinkButton($this->url.'/c/'.$myCompany,
                 $this->info[$myCompany]['nazev'], 'success');
         } else {
-            $return = new \Ease\TWB\LinkButton(constant('FLEXIBEE_URL'),
+            $return = new \Ease\TWB\LinkButton($myCompany,
                 _('Chyba komunikace'), 'danger');
         }
 
