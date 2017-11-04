@@ -12,26 +12,22 @@ namespace FlexiPeeHP\Bricks;
  *
  * @author vitex
  */
-class EmbedResponsivePDF extends \Ease\Html\Div
+class EmbedResponsivePDF extends EmbedResponsive
 {
-    public function __construct($url)
+
+    /**
+     * Ebed Document's PDF to Page
+     *
+     * @param \FlexiPeeHP\FlexiBeeRO $source object with document
+     * @param string                 $feeder script can send us the pdf
+     */
+    public function __construct($source, $feeder = 'getpdf.php')
     {
+        $url = $feeder.'?evidence='.$source->getEvidence().'&id='.$source->getMyKey().'&embed=true';
+
         parent::__construct('<object data=\''.$url.'\' type=\'application/pdf\' width=\'100%\' height=\'100%\'></object>',
             ['class' => 'embed-responsive', 'style' => 'padding-bottom:150%']);
     }
 
-    public function finalize()
-    {
-        $this->addCSS('
-.embed-responsive {
-    position: relative;
-    display: block;
-    height: 0;
-    padding: 0;
-    overflow: hidden;
-}
-');
-        parent::finalize();
-    }
 
 }
