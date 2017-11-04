@@ -1,0 +1,31 @@
+{
+    "name": "vitexsoftware/flexipeehp-bricks",
+    "description": "FlexiPeeHP code Sniplets",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Vitex",
+            "email": "info@vitexsoftware.cz"
+        }
+    ],
+    "require": {
+        "spoje.net/flexipeehp": "dev-master",
+        "vitexsoftware/ease-framework": "dev-master"
+    },
+    "autoload": {
+        "psr-4": {
+            "FlexiPeeHP\\Bricks\\": "FlexiPeeHP/Bricks"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Test\\Ease\\": "vendor/vitexsoftware/ease-framework/tests/src/Ease",
+            "Test\\FlexiPeeHP\\Bricks\\": "testing/FlexiPeeHP/Bricks",
+            "Test\\FlexiPeeHP\\": "vendor/spoje.net/flexipeehp/tests/src/FlexiPeeHP",
+            "Test\\": "testing/"
+        }
+    },
+    "require-dev": {
+        "codeception/codeception": "^2.3"
+    }
+}
