@@ -1,6 +1,7 @@
 <?php
+
 /**
- * FlexiPeeHP - Example how to show connection check InfoBox
+ * FlexiPeeHP - Example Accept WebHook
  *
  * @author     Vítězslav Dvořák <info@vitexsofware.cz>
  * @copyright  (G) 2017 Vitex Software
@@ -12,5 +13,7 @@ include_once './config.php';
 include_once '../vendor/autoload.php';
 include_once './common.php';
 
-$oPage->addItem(new \FlexiPeeHP\ui\StatusInfoBox());
-$oPage->draw();
+
+$hooker = new HookReciever();
+$hooker->takeChanges($hooker->listen());
+$hooker->processChanges();

@@ -14,13 +14,15 @@
     },
     "autoload": {
         "psr-4": {
-            "FlexiPeeHP\\Bricks\\": "FlexiPeeHP/Bricks"
+            "FlexiPeeHP\\Bricks\\": "FlexiPeeHP/Bricks",
+            "FlexiPeeHP\\ui\\": "FlexiPeeHP/ui"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "Test\\Ease\\": "vendor/vitexsoftware/ease-framework/tests/src/Ease",
             "Test\\FlexiPeeHP\\Bricks\\": "testing/FlexiPeeHP/Bricks",
+            "Test\\FlexiPeeHP\\ui\\": "testing/FlexiPeeHP/ui",
             "Test\\FlexiPeeHP\\": "vendor/spoje.net/flexipeehp/tests/src/FlexiPeeHP",
             "Test\\": "testing/"
         }

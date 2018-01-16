@@ -12,7 +12,19 @@ $embed    = $oPage->getRequestValue('embed');
 $id       = $oPage->getRequestValue('id');
 $evidence = $oPage->getRequestValue('evidence');
 
+function deleteAllBetween($beginning, $end, $string)
+{
+    $beginningPos = strpos($string, $beginning);
+    $endPos       = strpos($string, $end);
+    if ($beginningPos === false || $endPos === false) {
+        return $string;
+    }
 
+    $textToDelete = substr($string, $beginningPos,
+        ($endPos + strlen($end)) - $beginningPos);
+
+    return str_replace($textToDelete, '', $string);
+}
 $document = new \FlexiPeeHP\FlexiBeeRO(is_numeric($id) ? intval($id) : $id,
     ['evidence' => $evidence]);
 
@@ -21,6 +33,8 @@ if (!is_null($document->getMyKey())) {
 
     $documentBody = str_replace(['src="/', 'href="/'],
         ['src="'.$document->url.'/', 'href="'.$document->url.'/'], $documentBody);
+    $documentBody = deleteAllBetween('FLEXIBEE:TOOLBAR:START',
+        'FLEXIBEE:TOOLBAR:END', $documentBody);
 
     if ($embed != 'true') {
         header('Content-Description: File Transfer');

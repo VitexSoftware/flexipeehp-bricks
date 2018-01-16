@@ -5,7 +5,7 @@
  * @author vitex
  */
 
-namespace FlexiPeeHP\Bricks;
+namespace FlexiPeeHP\ui;
 
 /**
  * 
