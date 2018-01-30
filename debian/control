@@ -1,0 +1,25 @@
+Source: flexipeehp-bricks
+Build-Depends: debhelper (>= 7.0.50~),php-apigen
+Standards-Version: 3.8.4
+Maintainer: Vítězslav Dvořák <info@vitexsoftware.cz>
+Uploaders: Vitex <vitex@hippy.cz>
+Priority: optional
+Homepage: https://github.com/VitexSoftware/FlexiPeeHP-Bricks
+
+Package: flexipeehp-bricks
+Depends: ${misc:Depends},flexipeehp
+Suggests: composer,flexipeehp-doc,flexipeehp-bricks-doc
+Architecture: all
+Section: web
+Priority: optional
+Description: PHP Based FlexiBee RestAPI/Json library AddOns
+ Additional classess and code snipplets for FlexiPeeHP library
+
+Package: flexipeehp-bricks-doc
+Depends: ${misc:Depends}
+Suggests: www-browser
+Architecture: all
+Section: doc
+Priority: optional
+Description: PHP Based FlexiBee RestAPI/Json library Addons documentation
+ ApiGen html documentation for FlexiPeeHP Bricks php library

@@ -1,0 +1,32 @@
+{
+    "name": "flexipeehp-bricks",
+    "description": "PHP Based Library for easy interaction with czech accounting system Flexibee.",
+    "homepage": "https://github.com/VitexSoftware/FlexiPeeHP-Bricks",
+    "license": "GPL-2.0+",
+    "version": "0.1",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Vítězslav Dvořák",
+            "email": "vitex@arachne.cz"
+        }
+    ],
+    "require": {
+        "flexipeehp": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "FlexiPeeHP\\": "."
+        }
+    },
+    "minimum-stability": "dev",
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/usr/share/php/Ease",
+            "options": {
+                "symlink": true
+            }
+        }
+    ]
+}

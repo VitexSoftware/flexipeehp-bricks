@@ -1,0 +1,4 @@
+docs/*                      usr/share/doc/FlexiPeeHPBricks/html
+docs/resources/*            usr/share/doc/FlexiPeeHPBricks/html/resources
+debian/flexipeehp-bricks-doc.conf  usr/share/doc/flexipeehp-bricks-doc/apache
+README.md                   usr/share/doc/FlexiPeeHPBricks/

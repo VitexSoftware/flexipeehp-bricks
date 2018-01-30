@@ -1,4 +1,5 @@
 # FlexiPeeHP-Bricks
+![Project Logo](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/project_logo.png "Project Logo")
 
 Examples how to use [FlexiPeeHP](https://github.com/Spoje-NET/FlexiPeeHP) Library for FlexiBee with EasePHP Framework widgets
 
@@ -31,13 +32,18 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | [CurrencyExchange.php](src/CurrencyExchange.php)              | Funkce pro směnu měny v záznamu 
 | [getpdf.php](src/getpdf.php)                                  | Vrací PDF verzi dokumentu  
 | [RegisterAddress.php](src/RegisterAddress.php)                | Ukázka použití registračního formuláře
+| [UpomenNeplatice.php](src/UpomenNeplatice.php)                | Rozešle neplatičům upomínky
 | [webhook.php](src/RegisterAddress.php)                        | Endpoint pro příjem WebHooků
 
 # Třídy v FlexiPeeHP/Bricks/:
 
 | Soubor                                                        | Popis                                 |
 | ------------------------------------------------------------- | --------------------------------------|
+| [Customer.php](FlexiPeeHP/Bricks/Customer.php)| Zákazník
 | [HookReciever.php](FlexiPeeHP/Bricks/HookReciever.php)| Příjmač WebHooků
+| [PotvrzeniUhrady.php](FlexiPeeHP/Bricks/HookReciever.php)| Třída potvrzující došlou úhradu
+| [Upominac.php](FlexiPeeHP/Bricks/HookReciever.php)| Třída upomínající neplatiče
+| [Upominka.php](FlexiPeeHP/Bricks/HookReciever.php)| Třída upomínky pro neplatiče
 
 # Třídy v FlexiPeeHP/Bricks/ui:
 
@@ -49,3 +55,12 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | [RecordTypeSelect.php](FlexiPeeHP/Bricks/ui/RecordTypeSelect.php)      | Nabídka pro výběr typu dokumnetu 
 | [StatusInfoBox.php](FlexiPeeHP/Bricks/ui/StatusInfoBox.php)            | Info widget o stavu připojení
 
+Debian/Ubuntu
+-------------
+
+Pro Linux jsou k dispozici .deb balíčky. Prosím použijte repo:
+
+    wget -O - http://v.s.cz/info@vitexsoftware.cz.gpg.key|sudo apt-key add -
+    echo deb http://v.s.cz/ stable main > /etc/apt/sources.list.d/ease.list
+    apt update
+    apt install php-flexibee-bricks
