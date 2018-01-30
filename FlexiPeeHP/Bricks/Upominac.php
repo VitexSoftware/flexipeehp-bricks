@@ -309,7 +309,7 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
         if ($upominka->compile($cid, $clientDebts)) {
             $result = $upominka->send();
         } else {
-            $this->addStatusMessage(_('UPOMINKA NEBYLA ODESLANA!!!!'), 'warning');
+            $this->addStatusMessage(_('Remind was not sent'), 'warning');
         }
         $this->customer->adresar->insertToFlexiBee(['id' => $cid, 'stitky' => 'UPOMINKA'.$score]);
         $this->customer->adresar->loadFromFlexiBee($cid);
