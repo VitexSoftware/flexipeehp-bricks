@@ -5,8 +5,8 @@
  * @author     Vítězslav Dvořák <info@vitexsoftware.cz>
  * @copyright  2018 Spoje.Net
  */
-namespace FlexiPeeHP\Bricks;
 
+namespace FlexiPeeHP\Bricks;
 
 /**
  * Description of Upominka
@@ -27,19 +27,6 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
      * @var \FlexiPeeHP\FakturaVydana
      */
     public $invoicer = null;
-
-    /**
-     * FlexiBee => LMS id mapping
-     *
-     * @var array
-     */
-    public $lmsID = [];
-
-    /**
-     * LMS IDs to remove dashboard
-     * @var array
-     */
-    public $lmsIDtoEnable = [];
 
     /**
      * Reminder
@@ -70,12 +57,6 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
         $this->addStatusMessage(_('Getting debts'), 'debug');
         foreach ($clients as $cid => $clientIDs) {
             $stitky = $clientIDs['stitky'];
-            if (array_key_exists('external-ids', $clientIDs) && strstr($clientIDs['external-ids'][0],
-                    'ext:lms.cstmr:')) {
-                $this->lmsID[$cid] = str_replace('ext:lms.cstmr:', '',
-                    $clientIDs['external-ids'][0]);
-            }
-
             $debts = $this->customer->getCustomerDebts((int) $clientIDs['id']);
             if (count($debts)) {
                 foreach ($debts as $did => $debtInfo) {
@@ -83,9 +64,6 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
                     $debtCount++;
                 }
             } else { //All OK
-                if (isset($this->lmsID[$cid])) {
-                    $this->lmsIDtoEnable[$cid] = $this->lmsID[$cid];
-                }
                 $this->enableCustomer($stitky, $cid);
             }
         }
@@ -104,14 +82,12 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
     function enableCustomer($stitky, $cid)
     {
         $result = true;
-        if (strstr($stitky, 'UPOMINKA') || strstr($stitky, 'NEPLATIC') || strstr($stitky,
-                'ODPOJENO')) {
+        if (strstr($stitky, 'UPOMINKA') || strstr($stitky, 'NEPLATIC')) {
             $newStitky = array_combine(explode(',',
                     str_replace(' ', '', $stitky)), explode(',', $stitky));
             unset($newStitky['UPOMINKA1']);
             unset($newStitky['UPOMINKA2']);
             unset($newStitky['UPOMINKA3']);
-            unset($newStitky['ODPOJENO']);
             unset($newStitky['NEPLATIC']);
 
             if ($this->customer->adresar->insertToFlexiBee(['id' => $cid, 'stitky@removeAll' => 'true',
@@ -134,8 +110,6 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
      */
     public function processAllDebts()
     {
-        $dasboardIDs = ['dashboard' => [], 'disconnect' => []];
-
         $allDebths = $this->getDebths();
         $this->addStatusMessage(sprintf(_('%d clients to remind process'),
                 count($allDebths)));
@@ -143,7 +117,7 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
         foreach ($allDebths as $cid => $debts) {
             $counter++;
             $this->customer->adresar->loadFromFlexiBee($cid);
-            $this->addStatusMessage(sprintf(_('(%d / %d) #%s LMS# %s %s '),
+            $this->addStatusMessage(sprintf(_('(%d / %d) #%s code: %s %s '),
                     $counter, count($allDebths),
                     $this->customer->adresar->getDataValue('id'),
                     $this->customer->adresar->getDataValue('kod'),
@@ -154,64 +128,8 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
             $stitky = $this->customer->adresar->getDataValue('stitky');
 
             $remindAs = $this->prepareDashboard($cid, $zewlScore, $stitky);
-            if (!isset($this->lmsID[$cid])) {
-                $this->addStatusMessage(sprintf(_('User %s not present in LMS; cannot set dashboard '),
-                        $cid));
-                continue;
-            }
-
-            $dasboardIDs[$remindAs][$cid] = $this->lmsID[$cid];
-        }
-        if (count($dasboardIDs['dashboard'])) {
-            $this->setDashboards($dasboardIDs['dashboard']);
-        }
-        if (count($dasboardIDs['disconnect'])) {
-            $this->setDisconnect($dasboardIDs['disconnect']);
-        }
-        if (count($this->lmsIDtoEnable)) {
-            $this->setConnect($this->lmsIDtoEnable);
         }
         return $counter;
-    }
-
-    /**
-     * Prepare remind to Sent
-     *
-     * @param int    $cid    FlexiBee address ID
-     * @param int    $score  Zewl Score
-     * @param string $stitky Labels divided by columns
-     * 
-     * @return string Operation code connect|dashboard|disconnect
-     */
-    function prepareDashboard($cid, $score, $stitky)
-    {
-        $operation = 'connect';
-        switch ($score) {
-            case 0:
-                $this->enableCustomer($stitky, $cid);
-                break;
-            case 1:
-                break;
-            case 2:
-                if (!strstr($stitky, 'VIP') && !strstr($stitky, 'NODASHBOARD') && !strstr($stitky,
-                        'PROFI') && !strstr($stitky, 'ZAINTERESOVANI')) {
-                    $this->customer->adresar->insertToFlexiBee(['id' => $cid, 'stitky' => 'NEPLATIC']);
-                    $operation = 'dashboard';
-                    $this->addStatusMessage(sprintf(_('Dashboard for: %d '),
-                            $cid));
-                }
-                break;
-            case 3:
-                if (!strstr($stitky, 'VIP') && !strstr($stitky, 'NODISCONNECT') && !strstr($stitky,
-                        'NEODPOJOVAT') && !strstr($stitky, 'PROFI')) {
-                    $this->customer->adresar->insertToFlexiBee(['id' => $cid, 'stitky' => 'ODPOJENO']);
-                    $operation = 'disconnect';
-                    $this->addStatusMessage(sprintf(_('Disconnect for: %d '),
-                            $cid));
-                }
-                break;
-        }
-        return $operation;
     }
 
     /**
@@ -404,51 +322,6 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
     }
 
     /**
-     * Set Dashoards
-     *
-     * @param array $userIDs
-     */
-    public function setDashboards($userIDs)
-    {
-        $this->addStatusMessage(sprintf(_('Set dashboards for %d customers'),
-                count($userIDs)));
-        $sysStr = constant('DASHBOARD_SCRIPTS')."set-dashboards.py neplatic ".implode(' ',
-                $userIDs);
-        $this->addStatusMessage($sysStr, 'debug');
-        system("sudo $sysStr");
-    }
-
-    /**
-     * Set Disconnect
-     *
-     * @param array $userIDs
-     */
-    public function setDisconnect($userIDs)
-    {
-        $this->addStatusMessage(sprintf(_('Disconnect %d customers'),
-                count($userIDs)));
-        $sysStr = constant('DASHBOARD_SCRIPTS')."set-dashboards.py odpojen ".implode(' ',
-                $userIDs);
-        system("sudo $sysStr");
-        $this->addStatusMessage($sysStr, 'debug');
-    }
-
-    /**
-     * Connect Again
-     *
-     * @param array $userIDs
-     */
-    public function setConnect($userIDs)
-    {
-        $this->addStatusMessage(sprintf(_('Connect %d customers'),
-                count($userIDs)));
-        $sysStr = constant('DASHBOARD_SCRIPTS')."reset-dashboards.py  ".implode(' ',
-                $userIDs);
-        system("sudo $sysStr");
-        $this->addStatusMessage($sysStr, 'debug');
-    }
-
-    /**
      * Overdue group
      *
      * @param int $score current score value
@@ -468,6 +341,7 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
      * Get Number of days overdue
      * 
      * @param string $dueDate FlexiBee date
+     * 
      * @return int
      */
     static public function poSplatnosti($dueDate)
