@@ -57,7 +57,7 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
         $this->addStatusMessage(_('Getting debts'), 'debug');
         foreach ($clients as $cid => $clientIDs) {
             $stitky = $clientIDs['stitky'];
-            $debts = $this->customer->getCustomerDebts((int) $clientIDs['id']);
+            $debts  = $this->customer->getCustomerDebts((int) $clientIDs['id']);
             if (count($debts)) {
                 foreach ($debts as $did => $debtInfo) {
                     $allDebts[$cid][$did] = $debtInfo;
@@ -123,11 +123,7 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
                     $this->customer->adresar->getDataValue('kod'),
                     $this->customer->adresar->getDataValue('nazev')), 'debug');
 
-            $zewlScore = $this->processUserDebts($cid, $debts);
-
-            $stitky = $this->customer->adresar->getDataValue('stitky');
-
-            $remindAs = $this->prepareDashboard($cid, $zewlScore, $stitky);
+            $this->processUserDebts($cid, $debts);
         }
         return $counter;
     }
