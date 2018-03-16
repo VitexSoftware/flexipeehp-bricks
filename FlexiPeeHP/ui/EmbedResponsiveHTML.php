@@ -5,7 +5,7 @@
  * and open the template in the editor.
  */
 
-namespace FlexiPeeHP\Bricks;
+namespace FlexiPeeHP\ui;
 
 /**
  * Description of EmbedResponsive
