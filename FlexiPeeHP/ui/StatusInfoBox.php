@@ -1,14 +1,14 @@
 <?php
 /**
- * FlexiBee-Bricks
+ * FlexiPeeHP Bricks
  *
- * @author vitex
+ * @author Vítězslav Dvořák <info@vitexsoftware.cz>
  */
 
 namespace FlexiPeeHP\ui;
 
 /**
- * 
+ * FlexiBee connection status widget
  */
 class StatusInfoBox extends \FlexiPeeHP\Company
 {
