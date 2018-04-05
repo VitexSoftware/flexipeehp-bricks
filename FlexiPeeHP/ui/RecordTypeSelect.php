@@ -30,11 +30,11 @@ class RecordTypeSelect extends \Ease\Html\Select
         $typesRaw = $engine->getColumnsFromFlexibee(['nazev', $valueType],
             $conditions);
 
-        $types = [];
+        $types = [''=>_('Undefined')];
         foreach ($typesRaw as $type) {
             $types[$type[$valueType]] = $type['nazev'];
         }
 
-        parent::__construct($engine->getEvidence(), $types);
+        parent::__construct($engine->getEvidence(), $types,$engine->getMyKey());
     }
 }
