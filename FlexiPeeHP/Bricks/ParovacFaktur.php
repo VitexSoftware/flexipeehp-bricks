@@ -121,11 +121,6 @@ class ParovacFaktur extends \Ease\Sand
                     $this->banker->url.'/c/'.$this->banker->company.'/'.$this->banker->getEvidence().'/'.$paymentData['id']),
                 'info');
 
-            $this->banker->dataReset();
-            $this->banker->setDataValue('id', $paymentData['id']);
-            $this->banker->setDataValue('stitky', 'SYSTEM');
-            $this->banker->insertToFlexiBee();
-
 
             $invoices = $this->findInvoices($paymentData);
 //  kdyz se vrati jedna faktura:
@@ -261,6 +256,7 @@ class ParovacFaktur extends \Ease\Sand
      *
      * @param \FlexiPeeHP\FakturaVydana $zaloha
      * @param array $payment
+     * 
      * @return int vysledek 0 = chyba, 1 = sparovano, 2 sparovano a vytvorena faktura, -1 sparovnano ale chyba vytvoreni faktury
      */
     public function settleProforma($zaloha, $payment)
@@ -466,7 +462,6 @@ class ParovacFaktur extends \Ease\Sand
         $invoice2->setDataValue('duzpPuv', $today);
         $invoice2->setDataValue('duzpUcto', $today);
         $invoice2->setDataValue('datUcto', $today);
-        $invoice2->setDataValue('stitky', 'SYSTEM');
         $invoice2->setDataValue('stavMailK', 'stavMail.odeslat');
         $invoice2->insertToFlexiBee();
         if ($invoice2->lastResponseCode == 201) {
