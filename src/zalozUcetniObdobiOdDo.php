@@ -1,5 +1,6 @@
 <?php
-    /**
+
+/**
  * Create requested Accounting period
  *
  * @param int $startYear first year to create
@@ -7,8 +8,9 @@
  *
  * @return array Results
  */
-public function createYearsFrom($startYear, $endYear = null)
+function createYearsFrom($startYear, $endYear = null)
 {
+    $this   = new \FlexiPeeHP\UcetniObdobi();
     $result = [];
     if (is_null($endYear)) {
         $endYear = date('Y');

@@ -1,14 +1,14 @@
 <?php
 /**
- * FlexiBee-Bricks
+ * FlexiPeeHP Bricks
  *
- * @author vitex
+ * @author Vítězslav Dvořák <info@vitexsoftware.cz>
  */
 
 namespace FlexiPeeHP\ui;
 
 /**
- * 
+ * FlexiBee connection status widget
  */
 class StatusInfoBox extends \FlexiPeeHP\Company
 {
@@ -25,7 +25,7 @@ class StatusInfoBox extends \FlexiPeeHP\Company
     {
         parent::__construct();
         $infoRaw = $this->getFlexiData();
-        if (count($infoRaw)) {
+        if (count($infoRaw) && !array_key_exists('success', $infoRaw)) {
             $this->info = $this->reindexArrayBy($infoRaw, 'dbNazev');
         }
     }
@@ -40,7 +40,7 @@ class StatusInfoBox extends \FlexiPeeHP\Company
             $return = new \Ease\TWB\LinkButton($this->url.'/c/'.$myCompany,
                 $this->info[$myCompany]['nazev'], 'success');
         } else {
-            $return = new \Ease\TWB\LinkButton($myCompany,
+            $return = new \Ease\TWB\LinkButton($this->getApiURL(),
                 _('Chyba komunikace'), 'danger');
         }
 

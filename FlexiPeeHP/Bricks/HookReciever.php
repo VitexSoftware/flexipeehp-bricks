@@ -164,10 +164,8 @@ class HookReciever extends \FlexiPeeHP\Changes
     public function getLastProcessedVersion()
     {
         $lastProcessedVersion = null;
-        $chRaw                = $this->getColumnsFromSQL(['changeid'],
-            ['serverurl' => constant('FLEXIBEE_URL')]);
-        if (isset($chRaw[0]['changeid'])) {
-            $lastProcessedVersion = intval($chRaw[0]['changeid']);
+        if (false) {
+            $lastProcessedVersion = 0;
         } else {
             $this->addStatusMessage(_("Last Processed Change ID Loading Failed"),
                 'warning');
