@@ -262,12 +262,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Spoje-NET/FlexiPeeHP.git",
-                "reference": "1dbda46ba4fa82dc68abdc95034ab07ad3f5c23e"
+                "reference": "c13b5797417133268d88efc6501fef5e3ffcb78a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Spoje-NET/FlexiPeeHP/zipball/1dbda46ba4fa82dc68abdc95034ab07ad3f5c23e",
-                "reference": "1dbda46ba4fa82dc68abdc95034ab07ad3f5c23e",
+                "url": "https://api.github.com/repos/Spoje-NET/FlexiPeeHP/zipball/c13b5797417133268d88efc6501fef5e3ffcb78a",
+                "reference": "c13b5797417133268d88efc6501fef5e3ffcb78a",
                 "shasum": ""
             },
             "require": {
@@ -299,7 +299,7 @@
                 }
             ],
             "description": "PHP Based Library for easy interaction with czech accounting system Flexibee.",
-            "time": "2018-04-20T11:38:53+00:00"
+            "time": "2018-04-22T14:48:08+00:00"
         },
         {
             "name": "vitexsoftware/ease-framework",

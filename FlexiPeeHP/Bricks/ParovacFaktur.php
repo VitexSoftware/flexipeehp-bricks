@@ -162,7 +162,7 @@ class ParovacFaktur extends \Ease\Sand
                             $this->addStatusMessage(
                                 sprintf(_('Unknown invoice type: %s %s'),
                                     $invoiceData['typDokl'],
-                                    self::apiUrlToLink($invoice->apiURL)
+                                    $invoice->getApiURL()
                                 ), 'warning');
                             break;
                     }
@@ -565,25 +565,23 @@ class ParovacFaktur extends \Ease\Sand
         $sPays = [];
         $bPays = [];
 
-        if ($invoiceData['varSym']) {
+        if (array_key_exists('varSym', $invoiceData) && !empty($invoiceData['varSym'])) {
             $sPays = $this->findPayment(['varSym' => $invoiceData['varSym']]);
             $pays  = $sPays;
         }
 
-        if (!$invoiceData['specSym']) {
-            $invoiceData['specSym'] = (string) intval(str_replace('code:', '',
-                        $invoiceData['firma']));
-        }
-        if ($invoiceData['specSym']) {
+        if (array_key_exists('specSym', $invoiceData) && !empty($invoiceData['specSym'])) {
             $sPays = $this->findPayment(['specSym' => $invoiceData['specSym']]);
             $pays  = $sPays;
         }
 
-        if ($invoiceData['buc']) {
+        if (array_key_exists('buc', $invoiceData) && !empty($invoiceData['buc'])) {
             $bPays = $this->findPayment(['buc' => $invoiceData['buc']]);
-            foreach ($bPays as $payID => $payment) {
-                if (!array_key_exists($payID, $pays)) {
-                    $pays[$payID] = $payment;
+            if ($bPays) {
+                foreach ($bPays as $payID => $payment) {
+                    if (!array_key_exists($payID, $pays)) {
+                        $pays[$payID] = $payment;
+                    }
                 }
             }
         }
@@ -651,7 +649,8 @@ class ParovacFaktur extends \Ease\Sand
      * Najde nejlepší platbu pro danou fakturu
      *
      * @param array $payments pole příchozích plateb
-     * @param \LMSxFlexiBee\Invoice $invoice  faktura ke spárování
+     * @param \FlexiPeeHP\FakturaVydana $invoice  faktura ke spárování
+     * 
      * @return \FlexiPeeHP\Banka Bankovní pohyb
      */
     public function findBestPayment($payments, $invoice)
@@ -675,6 +674,7 @@ class ParovacFaktur extends \Ease\Sand
      * Zmeni url na link
      *
      * @param string $apiURL
+     * 
      * @return string
      */
     public static function apiUrlToLink($apiURL)

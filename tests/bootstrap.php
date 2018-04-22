@@ -12,8 +12,9 @@ if (file_exists('../vendor/autoload.php')) {
 }
 \Ease\Shared::instanced()->loadConfig('tests/client.json');
 
-/**
+/*
 $banka = 'HLAVNI';
+
 $prober = new FlexiPeeHP\FlexiBeeRW();
 $prober->setEvidence('bankovni-ucet');
 if (!$prober->recordExists(['kod' => $banka])) {
@@ -21,4 +22,8 @@ if (!$prober->recordExists(['kod' => $banka])) {
         'nazev' => $banka
     ]);
 }
+
+$labeler = new FlexiPeeHP\Stitek();
+$labeler->createNew('CHYBIFAKTURA', ['banka']);
+$labeler->createNew('NEIDENTIFIKOVANO', ['banka']);
 */

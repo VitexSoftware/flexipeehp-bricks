@@ -35,7 +35,7 @@ class ParovacFakturTest extends \Test\Ease\SandTest
             'datVyst' => \FlexiPeeHP\FlexiBeeRO::dateToFlexiDate($yesterday),
             'typDokl' => \FlexiPeeHP\FlexiBeeRO::code('FAKTURA')
                 ], $initialData));
-        $invoice->insertToFlexiBee();
+        $invoice->sync();
         return $invoice;
     }
 
@@ -54,15 +54,18 @@ class ParovacFakturTest extends \Test\Ease\SandTest
         $testCode = 'TEST_'.\Ease\Sand::randomString();
 
         $payment = new \FlexiPeeHP\Banka($initialData);
-        $payment->insertToFlexiBee( array_merge( [
-        'kod' => $testCode,
-        'banka' => 'code:HLAVNI',
-        'typPohybuK' => 'typPohybu.prijem',
-        'varSym' => 123,
-        'specSym' => 456,
-        'datVyst' => \FlexiPeeHP\FlexiBeeRO::dateToFlexiDate($yesterday),
-        'typDokl' => \FlexiPeeHP\FlexiBeeRO::code('STANDARD')
-        ], $initialData));
+
+        $payment->takeData(array_merge([
+            'kod' => $testCode,
+            'banka' => 'code:HLAVNI',
+            'typPohybuK' => 'typPohybu.prijem',
+            'varSym' => 123,
+            'specSym' => 456,
+            'datVyst' => \FlexiPeeHP\FlexiBeeRO::dateToFlexiDate($yesterday),
+            'typDokl' => \FlexiPeeHP\FlexiBeeRO::code('STANDARD')
+                ], $initialData));
+        $payment->sync();
+
         return $payment;
     }
 
@@ -121,6 +124,12 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function testInvoicesMatchingByBank()
     {
+        $dobropis        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('VDD'),
+            'popis' => 'InvoicesMatchingByBank FlexiPeeHP-Bricks Test']);
+        $dobropis        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ZÁLOHA'),
+            'popis' => 'InvoicesMatchingByBank FlexiPeeHP-Bricks Test']);
+        $dobropis        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ODD'),
+            'popis' => 'InvoicesMatchingByBank FlexiPeeHP-Bricks Test']);
         $this->object->setStartDay(-1);
         $this->object->invoicesMatchingByBank();
         $this->object->setStartDay(1);
@@ -133,7 +142,6 @@ class ParovacFakturTest extends \Test\Ease\SandTest
             $this->assertEquals('true',
                 $paymentChecker->getDataValue('sparovano'), 'Matching error');
         }
-        
     }
 
     /**
@@ -171,7 +179,7 @@ class ParovacFakturTest extends \Test\Ease\SandTest
         $zaloha  = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ZÁLOHA'),
             'popis' => 'Test SettleProforma FlexiPeeHP-Bricks']);
         $payment = $this->makePayment();
-        $this->object->settleProforma($zaloha, $payment);
+        $this->object->settleProforma($zaloha, $payment->getData());
     }
 
     /**
@@ -207,8 +215,8 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function testFindInvoices()
     {
-        $this->object->findInvoices(['varSym' => '123']);
-        $this->object->findInvoices(['specSym' => '356']);
+        $this->object->findInvoices(['id' => '1', 'varSym' => '123']);
+        $this->object->findInvoices(['id' => '2', 'specSym' => '356']);
     }
 
     /**
@@ -243,7 +251,22 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function testFindBestPayment()
     {
-        $this->object->findBestPayment($payments, $invoice);
+        $varSym  = \Ease\Sand::randomNumber(111111, 999999);
+        $specSym = \Ease\Sand::randomNumber(1111, 9999);
+        $price   = \Ease\Sand::randomNumber(111, 999);
+
+        $invoiceSs     = $this->makeInvoice(['varSym' => $varSym, 'specSym' => $specSym,
+            'sumCelkem' => $price]);
+        $paymentSs     = $this->makePayment(['specSym' => $specSym, 'sumCelkem' => $price]);
+        $bestSSPayment = $this->object->findBestPayment([$paymentSs->getData()],
+            $invoiceSs);
+
+        $this->assertTrue(is_object($bestSSPayment));
+        
+        $invoiceVs     = $this->makeInvoice(['varSym' => $varSym]);
+        $paymentVs     = $this->makePayment(['varSym' => $varSym]);
+        $bestVSPayment = $this->object->findBestPayment([$paymentVs->getData()],
+            $invoiceVs);
     }
 
     /**
