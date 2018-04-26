@@ -6,6 +6,14 @@ Examples how to use [FlexiPeeHP](https://github.com/Spoje-NET/FlexiPeeHP) Librar
 Příklady použití knihovny [FlexiPeeHP](https://github.com/Spoje-NET/FlexiPeeHP) pro [FlexiBee](https://flexibee.eu/)
 
 
+Instalace
+----------
+
+    composer require vitexsoftware/flexipeehp-bricks
+
+
+
+
 How to run ?
 ------------
 
