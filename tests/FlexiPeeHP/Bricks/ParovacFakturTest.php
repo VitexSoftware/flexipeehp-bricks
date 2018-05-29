@@ -87,6 +87,11 @@ class ParovacFakturTest extends \Test\Ease\SandTest
         
     }
 
+    public function testGetDocumentTypes()
+    {
+        $this->assertArrayHasKey('FAKTURA', $this->object->getDocumentTypes());
+    }
+    
     /**
      * @covers FlexiPeeHP\Bricks\ParovacFaktur::setStartDay
      */
@@ -124,11 +129,11 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function testInvoicesMatchingByBank()
     {
-        $dobropis        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('VDD'),
+        $faktura        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('FAKTURA'),
             'popis' => 'InvoicesMatchingByBank FlexiPeeHP-Bricks Test']);
-        $dobropis        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ZÁLOHA'),
+        $zaloha        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ZÁLOHA'),
             'popis' => 'InvoicesMatchingByBank FlexiPeeHP-Bricks Test']);
-        $dobropis        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ODD'),
+        $dobropis        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('DOBROPIS'),
             'popis' => 'InvoicesMatchingByBank FlexiPeeHP-Bricks Test']);
         $this->object->setStartDay(-1);
         $this->object->invoicesMatchingByBank();
@@ -273,7 +278,7 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      * @covers FlexiPeeHP\Bricks\ParovacFaktur::apiUrlToLink
      */
     public function testApiUrlToLink()
-    {
-        $this->object->apiUrlToLink($apiURL);
+    { 
+        $this->assertEquals('<a href="'.constant('FLEXIBEE_URL').'/c/'.constant('FLEXIBEE_COMPANY').'/banka.json" target="_blank" rel="nofollow">https://demo.flexibee.eu:5434/c/demo/banka.json</a>',  $this->object->apiUrlToLink($this->object->banker->apiURL));
     }
 }

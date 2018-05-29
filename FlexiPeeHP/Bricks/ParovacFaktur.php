@@ -27,6 +27,12 @@ class ParovacFaktur extends \Ease\Sand
     public $daysBack = 1;
 
     /**
+     * Invoice Types Cache
+     * @var array 
+     */
+    public $docTypes = [];
+
+    /**
      * Párovač faktur
      */
     public function __construct()
@@ -34,6 +40,27 @@ class ParovacFaktur extends \Ease\Sand
         parent::__construct();
         $this->invoicer = new \FlexiPeeHP\FakturaVydana();
         $this->banker   = new \FlexiPeeHP\Banka();
+    }
+
+    /**
+     * 
+     * @return array 
+     */
+    public function getDocumentTypes()
+    {
+        $types                            = [];
+        $evbackup                         = $this->invoicer->getEvidence();
+        $defbackup                        = $this->invoicer->defaultUrlParams;
+        $this->invoicer->setEvidence('typ-faktury-vydane');
+        $this->invoicer->defaultUrlParams = ['limit' => 0];
+        $typesRaw                         = $this->invoicer->getColumnsFromFlexibee([
+            'kod', 'typDoklK']);
+        $this->invoicer->setEvidence($evbackup);
+        $this->invoicer->defaultUrlParams = $defbackup;
+        foreach ($typesRaw as $rawtype) {
+            $types[$rawtype['kod']] = $rawtype['typDoklK'];
+        }
+        return $types;
     }
 
     /**
@@ -91,6 +118,7 @@ class ParovacFaktur extends \Ease\Sand
             'id',
             'kod',
             'stavUhrK',
+            'zbyvaUhradit',
             'firma',
             'buc',
             'varSym',
@@ -131,32 +159,38 @@ class ParovacFaktur extends \Ease\Sand
 
             if (count($invoices) && count(current($invoices))) {
                 $prijatoCelkem = floatval($paymentData['sumCelkem']);
+                $payment       = new \FlexiPeeHP\Banka($paymentData);
 
                 foreach ($invoices as $invoiceID => $invoiceData) {
                     $invoice = new \FlexiPeeHP\FakturaVydana((int) $invoiceData['id']);
 
-                    switch ($invoiceData['typDokl']) {
-//                        case 'code:KAUCE':
-                        case 'code:FAKTURA':
-                            if ($this->settleInvoice($invoice,
-                                    new \FlexiPeeHP\Banka('code:'.urlencode($paymentData['kod']))))
-                                    ;
+                    /*
+                     *    Standardní faktura (typDokladu.faktura)
+                     *    Dobropis/opravný daň. d. (typDokladu.dobropis)
+                     *    Zálohová faktura (typDokladu.zalohFaktura)
+                     *    Zálohový daňový doklad (typDokladu.zdd)
+                     *    Dodací list (typDokladu.dodList)
+                     *    Proforma (neúčetní) (typDokladu.proforma)
+                     *    Pohyb Kč / Zůstatek Kč (typBanUctu.kc)
+                     *    Pohyb měna / Zůstatek měna (typBanUctu.mena)
+                     */
+                    $docType = $this->getOriginDocumentType($invoiceData['typDokl']);
+                    switch ($docType) {
+                        case 'typDokladu.faktura':
+                            if ($this->settleInvoice($invoice, $payment)) ;
                             break;
-                        case 'code:ZÁLOHA':
-                        case 'code:ZALOHA':
+                        case 'typDokladu.proforma':
                             if ($this->settleProforma($invoice, $paymentData)) ;
                             break;
-                        case 'code:ODD':
-                        case 'code:DOBR':
-                        case 'code:DOBROPIS':
+                        case 'typDokladu.dobropis':
                             if ($this->settleCreditNote($invoice, $paymentData))
                                     ;
                             break;
 
                         default:
                             $this->addStatusMessage(
-                                sprintf(_('Unknown invoice type: %s %s'),
-                                    $invoiceData['typDokl'],
+                                sprintf(_('Unsupported document type: %s %s'),
+                                    $docType.': '.$invoiceData['typDokl'],
                                     $invoice->getApiURL()
                                 ), 'warning');
                             break;
@@ -183,28 +217,41 @@ class ParovacFaktur extends \Ease\Sand
     {
         foreach ($this->getInvoicesToProcess() as $invoiceData) {
             $payments = $this->findPayments($invoiceData);
-            if (count($payments) && count(current($payments))) {
+            if (!empty($payments) && count(current($payments))) {
+                $invoice = new \FlexiPeeHP\FakturaVydana($invoiceData);
                 $this->invoicer->setMyKey($invoiceData['id']);
-                switch ($invoiceData['typDokl']) {
-                    case 'code:FAKTURA':
-                        $this->settleInvoice(new \FlexiPeeHP\FakturaVydana((int) $invoiceData['id']),
-                            $payments);
-                        break;
-                    case 'code:ZALOHA':
-                        $this->settleProforma(new \FlexiPeeHP\FakturaVydana((int) $invoiceData['id']),
-                            $payments);
-                        break;
-                    case 'code:ODD':
-                    case 'code:DOBR':
-                    case 'code:DOBROPIS':
-                        $this->addStatusMessage('DOBROPIS !?!?', 'error');
-//                        $this->settleCreditNote(new \FlexiPeeHP\FakturaVydana((int) $invoiceData['id']),
-//                            $payments);
-                        break;
-                    default:
-                        $this->addStatusMessages(sprintf(_('Unknown invoice type: %s'),
-                                'warning'), $invoiceData['typDokl']);
-                        break;
+                /*
+                 *    Standardní faktura (typDokladu.faktura)
+                 *    Dobropis/opravný daň. d. (typDokladu.dobropis)
+                 *    Zálohová faktura (typDokladu.zalohFaktura)
+                 *    Zálohový daňový doklad (typDokladu.zdd)
+                 *    Dodací list (typDokladu.dodList)
+                 *    Proforma (neúčetní) (typDokladu.proforma)
+                 *    Pohyb Kč / Zůstatek Kč (typBanUctu.kc)
+                 *    Pohyb měna / Zůstatek měna (typBanUctu.mena)
+                 */
+
+                $docType = $this->getOriginDocumentType($invoiceData['typDokl']);
+                foreach ($payments as $paymentData) {
+                    $payment = new \FlexiPeeHP\Banka($paymentData);
+                    switch ($docType) {
+                        case 'typDokladu.faktura':
+                            if ($this->settleInvoice($invoice, $payment)) {
+                                
+                            }
+                            break;
+                        case 'typDokladu.proforma':
+                            $this->settleProforma($invoice, $payments);
+                            break;
+                        case 'typDokladu.dobropis':
+                            $this->settleCreditNote($invoice, $payments);
+                            break;
+                        default:
+                            $this->addStatusMessages(sprintf(_('Unsupported invoice type: %s'),
+                                    'warning'),
+                                $docType.': '.$invoiceData['typDokl']);
+                            break;
+                    }
                 }
             }
         }
@@ -269,8 +316,8 @@ class ParovacFaktur extends \Ease\Sand
         if ($zaloha->sparujPlatbu($platba, 'castecnaUhrada')) {
             $success = 1;
             $zaloha->addStatusMessage(sprintf(_('Platba %s  %s byla sparovana s zalohou %s'),
-                    (string) $payment['kod'], $prijataCastka, (string) $zaloha),
-                'success');
+                    \FlexiPeeHP\FlexiBeeRO::uncode($platba), $prijataCastka,
+                    (string) $zaloha), 'success');
 
             if ($zaloha->getDataValue('zbyvaUhradit') > $prijataCastka) { // Castecna Uhrada
 //                //Castecna uhrada
@@ -379,22 +426,24 @@ class ParovacFaktur extends \Ease\Sand
     /**
      * Provede "Zaplacení" vydané faktury
      *
-     * @param \FlexiPeeHP\FakturaVydana $invoice
-     * @param \FlexiPeeHP\Banka $payment
+     * @param \FlexiPeeHP\FakturaVydana $invoice Invoice to settle
+     * @param \FlexiPeeHP\Banka $payment Payment to settle by
      *
      * @return int vysledek 0 = chyba, 1 = sparovano
      */
     public function settleInvoice($invoice, $payment)
     {
         $success       = 0;
+        $zbytek        = 'ne';
         $prijataCastka = (float) $payment->getDataValue('sumCelkem');
+        $zbyvaUhradit  = $invoice->getDataValue('zbyvaUhradit');
 
-        if ($prijataCastka < $invoice->getDataValue('zbyvaUhradit')) { //Castecna uhrada
+        if ($prijataCastka < $zbyvaUhradit) { //Castecna uhrada
             $this->addStatusMessage(sprintf(_('Castecna uhrada - FAKTURA: prijato: %s ma byt zaplaceno %s'),
-                    $prijataCastka, $invoice->getDataValue('zbyvaUhradit')),
-                'warning');
+                    $prijataCastka, $zbyvaUhradit), 'warning');
+            $zbytek = 'castecnaUhrada';
         }
-        if ($prijataCastka > $invoice->getDataValue('zbyvaUhradit')) { //Castecna uhrada
+        if ($prijataCastka > $zbyvaUhradit) { //Castecna uhrada
             $this->addStatusMessage(sprintf(_('Přeplatek - FAKTURA: prijato: %s ma byt zaplaceno %s'),
                     $prijataCastka, $invoice->getDataValue('zbyvaUhradit')),
                 'warning');
@@ -403,16 +452,17 @@ class ParovacFaktur extends \Ease\Sand
             $this->banker->setDataValue('id', $payment->getDataValue('id'));
             $this->banker->setDataValue('stitky', 'PREPLATEK');
             $this->banker->insertToFlexiBee();
+            $zbytek = 'ignorovat';
         }
 
-        if ($invoice->sparujPlatbu($payment, 'castecnaUhrada')) { //Jak se ma FlexiBee zachovat pri preplatku/nedoplatku
+        if ($invoice->sparujPlatbu($payment, $zbytek)) { //Jak se ma FlexiBee zachovat pri preplatku/nedoplatku
             $success = 1;
             $invoice->insertToFlexiBee(['id' => (string) $invoice, 'stavMailK' => 'stavMail.odeslat']);
             $invoice->addStatusMessage(sprintf(_('Platba %s  %s byla sparovana s fakturou %s'),
-                    (string) $payment, $prijataCastka, (string) $invoice),
+                    \FlexiPeeHP\FlexiBeeRO::uncode($payment->getRecordIdent()),
+                    $prijataCastka,
+                    \FlexiPeeHP\FlexiBeeRO::uncode($invoice->getRecordIdent())),
                 'success');
-            //PDF Danoveho dokladu priloz k nemu samemu
-            //PDF Danoveho dokladu odesli mailem zakaznikovi y FLEXIBEE( nasledne pouzit tabulku Mail/Gandalf)
         }
 
         return $success;
@@ -490,6 +540,7 @@ class ParovacFaktur extends \Ease\Sand
         $sInvoices = [];
 //        $bInvoices = [];
 
+
         if (!empty($paymentData['varSym'])) {
             $vInvoices = $this->findInvoice(['varSym' => $paymentData['varSym']]);
         }
@@ -557,17 +608,22 @@ class ParovacFaktur extends \Ease\Sand
      */
     public function findPayments($invoiceData)
     {
+        $pays  = [];
         $sPays = [];
         $bPays = [];
 
         if (array_key_exists('varSym', $invoiceData) && !empty($invoiceData['varSym'])) {
             $sPays = $this->findPayment(['varSym' => $invoiceData['varSym']]);
-            $pays  = $sPays;
+            if (is_array($sPays)) {
+                $pays = $sPays;
+            }
         }
 
         if (array_key_exists('specSym', $invoiceData) && !empty($invoiceData['specSym'])) {
             $sPays = $this->findPayment(['specSym' => $invoiceData['specSym']]);
-            $pays  = $sPays;
+            if (is_array($bPays)) {
+                $pays = $bPays;
+            }
         }
 
         if (array_key_exists('buc', $invoiceData) && !empty($invoiceData['buc'])) {
@@ -653,7 +709,7 @@ class ParovacFaktur extends \Ease\Sand
         $value = $invoice->getDataValue('sumCelkem');
         foreach ($payments as $paymentID => $payment) {
             if ($payment['sumCelkem'] == $value) {
-                return new \FlexiPeeHP\Banka((int) $payments[$paymentID]['id']);
+                return new \FlexiPeeHP\Banka(\FlexiPeeHP\FlexiBeeRO::code($payments[$paymentID]['kod']));
             }
         }
 
@@ -666,7 +722,7 @@ class ParovacFaktur extends \Ease\Sand
     }
 
     /**
-     * Zmeni url na link
+     * Change url to html link
      *
      * @param string $apiURL
      * 
@@ -678,5 +734,25 @@ class ParovacFaktur extends \Ease\Sand
             preg_replace("#(^|[\n ])([\w]+?://[\w\#$%&~/.\-;:=,?@\[\]+]*)#is",
                 "\\1<a href=\"\\2\" target=\"_blank\" rel=\"nofollow\">\\2</a>",
                 $apiURL));
+    }
+
+    /**
+     * Return Document original type
+     * 
+     * @param string $typDokl
+     * 
+     * @return string typDokladu.faktura|typDokladu.dobropis|
+     *                typDokladu.zalohFaktura|typDokladu.zdd|
+     *                typDokladu.dodList|typDokladu.proforma|
+     *                typBanUctu.kc|typBanUctu.mena
+     */
+    public function getOriginDocumentType($typDokl)
+    {
+        if (empty($this->docTypes)) {
+            $this->docTypes = $this->getDocumentTypes();
+        }
+        $documentType = \FlexiPeeHP\FlexiBeeRO::uncode($typDokl);
+        return array_key_exists($documentType, $this->docTypes) ? $this->docTypes[$documentType]
+                : 'typDokladu.neznamy';
     }
 }
