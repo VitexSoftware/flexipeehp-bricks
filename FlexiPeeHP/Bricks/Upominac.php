@@ -43,10 +43,12 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
 
     /**
      * Obtain customer debths Array
+     * 
+     * @param array $skipLables labels of Customer (Addressbook) to skip
      *
      * @return Customer
      */
-    public function getDebths()
+    public function getDebths($skipLabels = [])
     {
         $allDebts  = [];
         $this->addStatusMessage(_('Getting clients'), 'debug');
@@ -56,19 +58,36 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
         $this->addStatusMessage(sprintf(_('%s Clients Found'), count($clients)));
         $this->addStatusMessage(_('Getting debts'), 'debug');
         foreach ($clients as $cid => $clientIDs) {
-            $stitky = $clientIDs['stitky'];
-            $debts  = $this->customer->getCustomerDebts((int) $clientIDs['id']);
-            if (count($debts)) {
+            $stitky = \FlexiPeeHP\Stitek::listToArray($clientIDs['stitky']);
+            if (count($skipLabels) && array_intersect($skipLabels, $stitky)) {
+                continue;
+            }
+
+            $debts = $this->customer->getCustomerDebts((int) $clientIDs['id']);
+            if (!empty($debts) && count($debts)) {
                 foreach ($debts as $did => $debtInfo) {
                     $allDebts[$cid][$did] = $debtInfo;
                     $debtCount++;
                 }
             } else { //All OK
-                $this->enableCustomer($stitky, $cid);
+                $this->everythingPaidOff($cid, $stitky);
             }
         }
         $this->addStatusMessage(sprintf(_('%s Debts Found'), $debtCount));
         return $allDebts;
+    }
+
+    /**
+     * What to do when no debts found for customer
+     * 
+     * @param int $clientID AddressBook ID
+     * @param array $stitky Customer's labels
+     * 
+     * @return boolean customer well processed
+     */
+    public function everythingPaidOff($clientID, $stitky)
+    {
+        return $this->enableCustomer(implode(',', $stitky), $clientID);
     }
 
     /**
@@ -106,11 +125,13 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
     /**
      * Process All Debts of All Customers
      *
+     * @param array $skipLabels Skip Customers (AddressBook) with any of given labels
+     * 
      * @return int All Debts count
      */
-    public function processAllDebts()
+    public function processAllDebts($skipLabels = [])
     {
-        $allDebths = $this->getDebths();
+        $allDebths = $this->getDebths($skipLabels);
         $this->addStatusMessage(sprintf(_('%d clients to remind process'),
                 count($allDebths)));
         $counter   = 0;

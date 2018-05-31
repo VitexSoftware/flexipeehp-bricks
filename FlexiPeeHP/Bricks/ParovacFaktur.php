@@ -27,12 +27,6 @@ class ParovacFaktur extends \Ease\Sand
     public $daysBack = 1;
 
     /**
-     * Invoice Types Cache
-     * @var array 
-     */
-    public $docTypes = [];
-
-    /**
      * Párovač faktur
      */
     public function __construct()
@@ -40,27 +34,6 @@ class ParovacFaktur extends \Ease\Sand
         parent::__construct();
         $this->invoicer = new \FlexiPeeHP\FakturaVydana();
         $this->banker   = new \FlexiPeeHP\Banka();
-    }
-
-    /**
-     * 
-     * @return array 
-     */
-    public function getDocumentTypes()
-    {
-        $types                            = [];
-        $evbackup                         = $this->invoicer->getEvidence();
-        $defbackup                        = $this->invoicer->defaultUrlParams;
-        $this->invoicer->setEvidence('typ-faktury-vydane');
-        $this->invoicer->defaultUrlParams = ['limit' => 0];
-        $typesRaw                         = $this->invoicer->getColumnsFromFlexibee([
-            'kod', 'typDoklK']);
-        $this->invoicer->setEvidence($evbackup);
-        $this->invoicer->defaultUrlParams = $defbackup;
-        foreach ($typesRaw as $rawtype) {
-            $types[$rawtype['kod']] = $rawtype['typDoklK'];
-        }
-        return $types;
     }
 
     /**
@@ -112,9 +85,10 @@ class ParovacFaktur extends \Ease\Sand
      */
     public function getInvoicesToProcess()
     {
-        $result                                    = [];
-        $this->invoicer->defaultUrlParams['order'] = 'datVyst@A';
-        $invoices                                  = $this->invoicer->getColumnsFromFlexibee([
+        $result                                       = [];
+        $this->invoicer->defaultUrlParams['order']    = 'datVyst@A';
+        $this->invoicer->defaultUrlParams['includes'] = '/faktura-vydana/typDokl';
+        $invoices                                     = $this->invoicer->getColumnsFromFlexibee([
             'id',
             'kod',
             'stavUhrK',
@@ -123,6 +97,7 @@ class ParovacFaktur extends \Ease\Sand
             'buc',
             'varSym',
             'specSym',
+            'typDokl(typDoklK,kod)',
             'sumCelkem',
             'duzpPuv',
             'typDokl',
@@ -133,6 +108,7 @@ class ParovacFaktur extends \Ease\Sand
         if ($this->invoicer->lastResponseCode == 200) {
             $result = $invoices;
         }
+        unset($this->invoicer->defaultUrlParams['includes']);
         return $result;
     }
 
@@ -162,7 +138,12 @@ class ParovacFaktur extends \Ease\Sand
                 $payment       = new \FlexiPeeHP\Banka($paymentData);
 
                 foreach ($invoices as $invoiceID => $invoiceData) {
-                    $invoice = new \FlexiPeeHP\FakturaVydana((int) $invoiceData['id']);
+
+                    $typDokl                = $invoiceData['typDokl'][0];
+                    $docType                = $typDokl['typDoklK'];
+                    $invoiceData['typDokl'] = \FlexiPeeHP\FlexiBeeRO::code($typDokl['kod']);
+
+                    $invoice = new \FlexiPeeHP\FakturaVydana($invoiceData);
 
                     /*
                      *    Standardní faktura (typDokladu.faktura)
@@ -174,8 +155,9 @@ class ParovacFaktur extends \Ease\Sand
                      *    Pohyb Kč / Zůstatek Kč (typBanUctu.kc)
                      *    Pohyb měna / Zůstatek měna (typBanUctu.mena)
                      */
-                    $docType = $this->getOriginDocumentType($invoiceData['typDokl']);
+
                     switch ($docType) {
+                        case 'typDokladu.zalohFaktura':
                         case 'typDokladu.faktura':
                             if ($this->settleInvoice($invoice, $payment)) ;
                             break;
@@ -190,7 +172,7 @@ class ParovacFaktur extends \Ease\Sand
                         default:
                             $this->addStatusMessage(
                                 sprintf(_('Unsupported document type: %s %s'),
-                                    $docType.': '.$invoiceData['typDokl'],
+                                    $typDokl['typDoklK@showAs'].' ('.$docType.'): '.$invoiceData['typDokl'],
                                     $invoice->getApiURL()
                                 ), 'warning');
                             break;
@@ -218,6 +200,9 @@ class ParovacFaktur extends \Ease\Sand
         foreach ($this->getInvoicesToProcess() as $invoiceData) {
             $payments = $this->findPayments($invoiceData);
             if (!empty($payments) && count(current($payments))) {
+                $typDokl                = $invoiceData['typDokl'][0];
+                $docType                = $typDokl['typDoklK'];
+                $invoiceData['typDokl'] = \FlexiPeeHP\FlexiBeeRO::code($typDokl['kod']);
                 $invoice = new \FlexiPeeHP\FakturaVydana($invoiceData);
                 $this->invoicer->setMyKey($invoiceData['id']);
                 /*
@@ -231,10 +216,10 @@ class ParovacFaktur extends \Ease\Sand
                  *    Pohyb měna / Zůstatek měna (typBanUctu.mena)
                  */
 
-                $docType = $this->getOriginDocumentType($invoiceData['typDokl']);
                 foreach ($payments as $paymentData) {
                     $payment = new \FlexiPeeHP\Banka($paymentData);
                     switch ($docType) {
+                        case 'typDokladu.zalohFaktura':
                         case 'typDokladu.faktura':
                             if ($this->settleInvoice($invoice, $payment)) {
                                 
@@ -247,9 +232,11 @@ class ParovacFaktur extends \Ease\Sand
                             $this->settleCreditNote($invoice, $payments);
                             break;
                         default:
-                            $this->addStatusMessages(sprintf(_('Unsupported invoice type: %s'),
-                                    'warning'),
-                                $docType.': '.$invoiceData['typDokl']);
+                            $this->addStatusMessage(
+                                sprintf(_('Unsupported document type: %s %s'),
+                                    $typDokl['typDoklK@showAs'].' ('.$docType.'): '.$invoiceData['typDokl'],
+                                    $invoice->getApiURL()
+                                ), 'warning');
                             break;
                     }
                 }
@@ -561,14 +548,14 @@ class ParovacFaktur extends \Ease\Sand
 //        }
 //
 
-        if (count($vInvoices)) {
+        if (!empty($vInvoices) && count($vInvoices)) {
             foreach ($vInvoices as $invoiceID => $invoice) {
                 if (!array_key_exists($invoiceID, $invoices)) {
                     $invoices[$invoiceID] = $invoice;
                 }
             }
         }
-        if (count($sInvoices)) {
+        if (!empty($sInvoices) && count($sInvoices)) {
             foreach ($sInvoices as $invoiceID => $invoice) {
                 if (!array_key_exists($invoiceID, $invoices)) {
                     $invoices[$invoiceID] = $invoice;
@@ -648,15 +635,16 @@ class ParovacFaktur extends \Ease\Sand
      */
     public function findInvoice($what)
     {
-        $result                                    = null;
-        $this->invoicer->defaultUrlParams['order'] = 'datVyst@A';
-        $payments                                  = $this->invoicer->getColumnsFromFlexibee([
+        $result                                       = null;
+        $this->invoicer->defaultUrlParams['order']    = 'datVyst@A';
+        $this->invoicer->defaultUrlParams['includes'] = '/faktura-vydana/typDokl';
+        $payments                                     = $this->invoicer->getColumnsFromFlexibee([
             'id',
             'varSym',
             'specSym',
             'buc',
             'kod',
-            'typDokl',
+            'typDokl(typDoklK,kod)',
             'sumCelkem',
             'stitky',
             'datVyst'],
@@ -665,7 +653,7 @@ class ParovacFaktur extends \Ease\Sand
         if ($this->invoicer->lastResponseCode == 200) {
             $result = $payments;
         }
-
+        unset($this->invoicer->defaultUrlParams['includes']);
         return $result;
     }
 
