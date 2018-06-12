@@ -29,8 +29,6 @@ $invoices = $invoice->getColumnsFromFlexibee(['id', 'kod', 'cisDosle', 'sumCelke
     'nazFirmy'], ['storno' => false,'limit'=>20]);
 
 if (!empty($invoices)) {
-    $listing = new \Ease\Html\UlTag();
-
     foreach ($invoices as $invoiceData) {
         $invoiceRow = new \Ease\TWB\Row();
         $invoiceRow->addColumn(2, $invoiceData['kod']);
