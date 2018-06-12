@@ -24,10 +24,20 @@ class EmbedResponsivePDF extends EmbedResponsive
      * @param string                 $feeder script can send us the pdf
      * @param string                 $report printSet name
      */
-    public function __construct($source, $feeder = 'getpdf.php', $report)
+    public function __construct($source, $feeder = 'getpdf.php', $report = null)
     {
-        $url = $feeder.'?evidence='.$source->getEvidence().'&id='.$source->getMyKey().'&report-name='. urlencode($report) .'&embed=true';
+        $addParams = ['evidence'=> $source->getEvidence(),'embed'=>'true'];
 
+        if(!empty($source->getMyKey())){
+            $addParams['id'] = $source->getMyKey();
+        }
+        
+        if(!empty($report)){
+            $addParams['report-name'] = urlencode($report);
+        }
+        
+        $url = \Ease\Shared::addUrlParams($feeder, $addParams);
+        
         parent::__construct('<object data=\''.$url.'\' type=\'application/pdf\' width=\'100\'></object>',
             ['class' => 'embed-responsive', 'style' => 'padding-bottom:600px']);
     }

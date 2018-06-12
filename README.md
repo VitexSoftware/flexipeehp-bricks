@@ -17,7 +17,7 @@ Instalace
 How to run ?
 ------------
 
-1) composer update
+1) composer install
 2) cd src
 3) modify config.php to use custom FlexiBee connection
 4) open the project url in browser
@@ -63,6 +63,20 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | [EmbedResponsivePDF.php](FlexiPeeHP/Bricks/ui/EmbedResponsivePDF.php)  | Třída pro zobrazení PDF dokumentu na stránce 
 | [RecordTypeSelect.php](FlexiPeeHP/Bricks/ui/RecordTypeSelect.php)      | Nabídka pro výběr typu dokumnetu 
 | [StatusInfoBox.php](FlexiPeeHP/Bricks/ui/StatusInfoBox.php)            | Info widget o stavu připojení
+
+
+Ukázky ve složce Examples
+=========================
+
+Výpis faktur do stránky: [invoices.php](FlexiPeeHP/Examples/invoices.php)
+
+![Výpis](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/FlexiPeeHP/Examples/invoices.png)
+
+Vložení PDF do stránky: [embed.php](FlexiPeeHP/Examples/embed.php)
+
+![Vložení](FlexiPeeHP/Examples/embde.png)
+
+Převzetí dokladu z FlexiBee a jeho odeslání do prohlížeče: [getpdf.php](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/FlexiPeeHP/Examples/getpdf.php)
 
 Debian/Ubuntu
 -------------
