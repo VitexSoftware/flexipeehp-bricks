@@ -65,8 +65,8 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | [StatusInfoBox.php](FlexiPeeHP/Bricks/ui/StatusInfoBox.php)            | Info widget o stavu připojení
 
 
-Ukázky ve složce Examples
-=========================
+Ukázky ve složce [Examples](Examples)
+=====================================
 
 Výpis faktur do stránky: [invoices.php](Examples/invoices.php)
 
