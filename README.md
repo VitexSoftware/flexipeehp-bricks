@@ -68,15 +68,15 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 Ukázky ve složce Examples
 =========================
 
-Výpis faktur do stránky: [invoices.php](FlexiPeeHP/Examples/invoices.php)
+Výpis faktur do stránky: [invoices.php](Examples/invoices.php)
 
-![Výpis](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/FlexiPeeHP/Examples/invoices.png)
+![Výpis](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/invoices.png)
 
-Vložení PDF do stránky: [embed.php](FlexiPeeHP/Examples/embed.php)
+Vložení PDF do stránky: [embed.php](Examples/embed.php)
 
-![Vložení](FlexiPeeHP/Examples/embde.png)
+![Vložení](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/embed.png)
 
-Převzetí dokladu z FlexiBee a jeho odeslání do prohlížeče: [getpdf.php](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/FlexiPeeHP/Examples/getpdf.php)
+Převzetí dokladu z FlexiBee a jeho odeslání do prohlížeče: [getpdf.php](Examples/getpdf.php)
 
 Debian/Ubuntu
 -------------
