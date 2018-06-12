@@ -1,0 +1,13 @@
+{
+    "name": "vitexsoftware/flexipeehp-bricks-example",
+    "description": "List Invoices and embed choosen invoice PDF in english to webpage",
+    "authors": [
+        {
+            "name": "Vítězslav Dvořák",
+            "email": "info@vitexsoftware.cz"
+        }
+    ],
+    "require": {
+        "vitexsoftware/flexipeehp-bricks": ">=0.3"
+    }
+}
