@@ -20,10 +20,14 @@ class StatusInfoBox extends \FlexiPeeHP\Company
 
     /**
      * Try to connect to FlexiBee
+     *
+     * @param string|array $init    company dbNazev or initial data
+     * @param array        $options Connection settings override
      */
-    public function __construct()
+    
+    public function __construct($init = null, $properites = [])
     {
-        parent::__construct();
+        parent::__construct($init, $properites);
         $infoRaw = $this->getFlexiData();
         if (count($infoRaw) && !array_key_exists('success', $infoRaw)) {
             $this->info = $this->reindexArrayBy($infoRaw, 'dbNazev');
@@ -41,7 +45,7 @@ class StatusInfoBox extends \FlexiPeeHP\Company
                 $this->info[$myCompany]['nazev'], 'success');
         } else {
             $return = new \Ease\TWB\LinkButton($this->getApiURL(),
-                _('Chyba komunikace'), 'danger');
+                _('Connection Problem'), 'danger');
         }
 
         $return->draw();

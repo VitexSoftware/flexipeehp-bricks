@@ -78,6 +78,11 @@ Vložení PDF do stránky: [embed.php](Examples/embed.php)
 
 Převzetí dokladu z FlexiBee a jeho odeslání do prohlížeče: [getpdf.php](Examples/getpdf.php)
 
+Formulář pro zadání přihlašovacích údajů FlexiBee a zobrazení zdali bylo připojení úspěšné: [statussignin.php](Examples/statussignin.php)
+
+![Test Připojení](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/statussignin.png)
+
+
 Debian/Ubuntu
 -------------
 
