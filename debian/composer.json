@@ -16,7 +16,8 @@
     },
     "autoload": {
         "psr-4": {
-            "FlexiPeeHP\\": "."
+            "FlexiPeeHP\\Bricks\\": "./Bricks",
+            "FlexiPeeHP\\ui\\": "./ui"
         }
     },
     "minimum-stability": "dev",
@@ -24,6 +25,13 @@
         {
             "type": "path",
             "url": "/usr/share/php/Ease",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "path",
+            "url": "/usr/share/php/FlexiPeeHP",
             "options": {
                 "symlink": true
             }

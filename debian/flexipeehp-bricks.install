@@ -1,3 +1,3 @@
 FlexiPeeHP/Bricks/*.php      /usr/share/php/FlexiPeeHPBricks/Bricks
 FlexiPeeHP/ui/*.php          /usr/share/php/FlexiPeeHPBricks/ui
-debian/composer.json		 /usr/share/php/FlexiPeeHPBricks
+debian/composer.json	     /usr/share/php/FlexiPeeHPBricks
