@@ -3,20 +3,21 @@
 namespace FlexiPeeHP\Bricks;
 
 /**
- * Description of ParovacFaktur
+ * Invoice matching class
  *
- * @author vitex
+ * @copyright (c) 2018, Vítězslav Dvořák
+ * @author Vítězslav Dvořák <info@vitexsoftware.cz>
  */
 class ParovacFaktur extends \Ease\Sand
 {
     /**
-     * Objekt Banky
-     * @var \FlexiPeeHP\FakturaVydana
+     * Invoice handler object
+     * @var \FlexiPeeHP\FakturaVydana|\FlexiPeeHP\FakturaPrijata
      */
     private $invoicer;
 
     /**
-     * Objekt Banky
+     * account statements handler object
      * @var \FlexiPeeHP\Banka
      */
     public $banker;
@@ -27,13 +28,12 @@ class ParovacFaktur extends \Ease\Sand
     public $daysBack = 1;
 
     /**
-     * Párovač faktur
+     * Invoice matcher
      */
     public function __construct()
     {
         parent::__construct();
-        $this->invoicer = new \FlexiPeeHP\FakturaVydana();
-        $this->banker   = new \FlexiPeeHP\Banka();
+        $this->banker = new \FlexiPeeHP\Banka();
     }
 
     /**
@@ -43,17 +43,22 @@ class ParovacFaktur extends \Ease\Sand
      */
     public function setStartDay($daysBack)
     {
+        if (!is_null($daysBack)) {
         $this->addStatusMessage('Start Date '.date('Y-m-d',
                 mktime(0, 0, 0, date("m"), date("d") - $daysBack, date("Y"))));
+        }
         $this->daysBack = $daysBack;
     }
 
     /**
-     * Vrací dnešní nespárované příjmy na účtu
+     * Get unmatched payments within given days and direction
      *
+     * @param int    $daysBack Maximum age of payment
+     * @param string $direction Incoming or outcoming payents in|out
+     * 
      * @return array
      */
-    public function getPaymentsToProcess($daysBack = 1)
+    public function getPaymentsToProcess($daysBack = 1, $direction = 'in')
     {
         $result                                  = [];
         $this->banker->defaultUrlParams['order'] = 'datVyst@A';
@@ -64,9 +69,51 @@ class ParovacFaktur extends \Ease\Sand
             'specSym',
             'sumCelkem',
             'datVyst'],
-            ["sparovano eq false AND typPohybuK eq 'typPohybu.prijem' AND storno eq false AND datVyst eq '".\FlexiPeeHP\FlexiBeeRW::timestampToFlexiDate(mktime(0,
-                        0, 0, date("m"), date("d") - $daysBack, date("Y")))."' "],
-            'id');
+            ["sparovano eq false AND typPohybuK eq '".(($direction == 'out') ? 'typPohybu.vydej'
+                : 'typPohybu.prijem' )."' AND storno eq false ".
+            (is_null($daysBack) ? '' :
+            "AND datVyst eq '".\FlexiPeeHP\FlexiBeeRW::timestampToFlexiDate(mktime(0,
+                    0, 0, date("m"), date("d") - $daysBack, date("Y")))."' ")
+            ], 'id');
+
+        if ($this->banker->lastResponseCode == 200) {
+            if (empty($payments)) {
+                $result = [];
+            } else {
+                $result = $payments;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * 
+     * @param \DatePeriod $period
+     * @param string  $direction
+     * 
+     * @return array
+     */
+    public function getPaymentsWithinPeriod(\DatePeriod $period,
+                                            $direction = 'in')
+    {
+        $result                                  = [];
+        $this->banker->defaultUrlParams['order'] = 'datVyst@A';
+        
+        $conds['storno'] = false;
+        $conds['sparovano'] = false;
+        $conds['typPohybuK'] = ($direction == 'out') ? 'typPohybu.vydej'
+                : 'typPohybu.prijem';
+        
+        $conds['datVyst'] = $period;
+        
+        $payments                                = $this->banker->getColumnsFromFlexibee([
+            'id',
+            'kod',
+            'varSym',
+            'specSym',
+            'sumCelkem',
+            'datVyst'],
+            $conds, 'id');
 
         if ($this->banker->lastResponseCode == 200) {
             if (empty($payments)) {
@@ -113,11 +160,12 @@ class ParovacFaktur extends \Ease\Sand
     }
 
     /**
-     * Párování faktur podle příchozích plateb v bance
+     * Párování odchozích faktur podle příchozích plateb v bance
      */
-    public function invoicesMatchingByBank()
+    public function outInvoicesMatchingByBank()
     {
-        foreach ($this->getPaymentsToProcess($this->daysBack) as $paymentData) {
+        $this->invoicer = new \FlexiPeeHP\FakturaVydana();
+        foreach ($this->getPaymentsToProcess($this->daysBack, 'in') as $paymentData) {
 
             $this->addStatusMessage(sprintf('Processing Payment %s %s vs: %s ss: %s %s',
                     $paymentData['kod'], $paymentData['sumCelkem'],
@@ -193,6 +241,43 @@ class ParovacFaktur extends \Ease\Sand
     }
 
     /**
+     * Párování prichozich faktur podle odchozich plateb v bance
+     * 
+     * @param  $name Description
+     * 
+     */
+    public function inInvoicesMatchingByBank(\DatePeriod $range = null)
+    {
+        $this->invoicer = new \FlexiPeeHP\FakturaPrijata();
+        foreach ($this->getPaymentsWithinPeriod($range, 'out') as $paymentId => $paymentData) {
+            $this->banker->setMyKey($paymentId);
+            $this->addStatusMessage(sprintf('Processing Payment %s %s vs: %s ss: %s %s',
+                    $paymentData['kod'], $paymentData['sumCelkem'],
+                    $paymentData['varSym'], $paymentData['specSym'],
+                    $this->banker->getApiURL()), 'info');
+
+
+            $invoices = $this->findInvoices($paymentData);
+//  kdyz se vrati jedna faktura:
+//     kdyz  je prijata castka mensi nebo rovno tak zlikviduji celou
+//     kdyz sedi castka, nebo castecne
+//  kdyz se vrati vic faktur  tak kdyz sedi castka uhrazuje se ta nejstarsi
+//  jinak se uhrazuje castecne
+
+            if (count($invoices) && count(current($invoices))) {
+                $prijatoCelkem = floatval($paymentData['sumCelkem']);
+                $payment       = new \FlexiPeeHP\Banka($paymentData);
+
+                foreach ($invoices as $invoiceID => $invoiceData) {
+                    $invoice = new \FlexiPeeHP\FakturaVydana($invoiceData,
+                        ['evidence' => 'faktura-prijata']);
+                    if ($this->settleInvoice($invoice, $payment)) ;
+                }
+                }
+            }
+        }
+
+    /**
      * Párování faktur dle nezaplacenych faktur
      */
     public function invoicesMatchingByInvoices()
@@ -203,7 +288,7 @@ class ParovacFaktur extends \Ease\Sand
                 $typDokl                = $invoiceData['typDokl'][0];
                 $docType                = $typDokl['typDoklK'];
                 $invoiceData['typDokl'] = \FlexiPeeHP\FlexiBeeRO::code($typDokl['kod']);
-                $invoice = new \FlexiPeeHP\FakturaVydana($invoiceData);
+                $invoice                = new \FlexiPeeHP\FakturaVydana($invoiceData);
                 $this->invoicer->setMyKey($invoiceData['id']);
                 /*
                  *    Standardní faktura (typDokladu.faktura)
