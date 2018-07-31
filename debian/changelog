@@ -1,8 +1,8 @@
-flexipeehp-bricks (0.7) experimental; urgency=low
+flexipeehp-bricks (0.8) experimental; urgency=low
 
   [ Vítězslav Vitex Dvořák ]
 
-  * Initial Release
+  * EUR support
 
   [ Vítězslav Dvořák ]
   * Packaging

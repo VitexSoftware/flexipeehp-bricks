@@ -28,10 +28,29 @@ class ParovacFaktur extends \Ease\Sand
     public $daysBack = 1;
 
     /**
+     * Configuration options
+     * @var array 
+     */
+    private $config = [];
+
+    /**
+     * Requied Config Keys
+     * @var array 
+     */
+    public $cfgRequed = ["LABEL_PREPLATEK", "LABEL_CHYBIFAKTURA", "LABEL_NEIDENTIFIKOVANO"];
+
+    /**
      * Invoice matcher
      */
-    public function __construct()
+    public function __construct($configuration = [])
     {
+        $this->config = array_merge($this->config, $configuration);
+        foreach ($this->cfgRequed as $key) {
+            if ((array_key_exists($key, $this->config) === false) || empty($this->config[$key])) {
+                throw new \Ease\Exception(sprintf(_('Configuration key %s is not set'),
+                    $key));
+            }
+        }
         parent::__construct();
         $this->banker = new \FlexiPeeHP\Banka();
     }
@@ -68,6 +87,7 @@ class ParovacFaktur extends \Ease\Sand
             'varSym',
             'specSym',
             'sumCelkem',
+            'mena',
             'datVyst'],
             ["sparovano eq false AND typPohybuK eq '".(($direction == 'out') ? 'typPohybu.vydej'
                 : 'typPohybu.prijem' )."' AND storno eq false ".
@@ -99,21 +119,20 @@ class ParovacFaktur extends \Ease\Sand
         $result                                  = [];
         $this->banker->defaultUrlParams['order'] = 'datVyst@A';
         
-        $conds['storno'] = false;
-        $conds['sparovano'] = false;
-        $conds['typPohybuK'] = ($direction == 'out') ? 'typPohybu.vydej'
-                : 'typPohybu.prijem';
+        $conds['storno']     = false;
+        $conds['sparovano']  = false;
+        $conds['typPohybuK'] = ($direction == 'out') ? 'typPohybu.vydej' : 'typPohybu.prijem';
         
         $conds['datVyst'] = $period;
         
-        $payments                                = $this->banker->getColumnsFromFlexibee([
+        $payments = $this->banker->getColumnsFromFlexibee([
             'id',
             'kod',
             'varSym',
             'specSym',
             'sumCelkem',
-            'datVyst'],
-            $conds, 'id');
+            'mena',
+            'datVyst'], $conds, 'id');
 
         if ($this->banker->lastResponseCode == 200) {
             if (empty($payments)) {
@@ -142,6 +161,7 @@ class ParovacFaktur extends \Ease\Sand
             'zbyvaUhradit',
             'firma',
             'buc',
+            'mena',
             'varSym',
             'specSym',
             'typDokl(typDoklK,kod)',
@@ -167,8 +187,9 @@ class ParovacFaktur extends \Ease\Sand
         $this->invoicer = new \FlexiPeeHP\FakturaVydana();
         foreach ($this->getPaymentsToProcess($this->daysBack, 'in') as $paymentData) {
 
-            $this->addStatusMessage(sprintf('Processing Payment %s %s vs: %s ss: %s %s',
+            $this->addStatusMessage(sprintf('Processing Payment %s %s %s vs: %s ss: %s %s',
                     $paymentData['kod'], $paymentData['sumCelkem'],
+                    \FlexiPeeHP\FlexiBeeRO::uncode($paymentData['mena']),
                     $paymentData['varSym'], $paymentData['specSym'],
                     $this->banker->url.'/c/'.$this->banker->company.'/'.$this->banker->getEvidence().'/'.$paymentData['id']),
                 'info');
@@ -251,8 +272,9 @@ class ParovacFaktur extends \Ease\Sand
         $this->invoicer = new \FlexiPeeHP\FakturaPrijata();
         foreach ($this->getPaymentsWithinPeriod($range, 'out') as $paymentId => $paymentData) {
             $this->banker->setMyKey($paymentId);
-            $this->addStatusMessage(sprintf('Processing Payment %s %s vs: %s ss: %s %s',
+            $this->addStatusMessage(sprintf('Processing Payment %s %s %s vs: %s ss: %s %s',
                     $paymentData['kod'], $paymentData['sumCelkem'],
+                    \FlexiPeeHP\FlexiBeeRO::uncode($paymentData['mena']),
                     $paymentData['varSym'], $paymentData['specSym'],
                     $this->banker->getApiURL()), 'info');
 
@@ -354,7 +376,8 @@ class ParovacFaktur extends \Ease\Sand
 
             $this->banker->dataReset();
             $this->banker->setDataValue('id', $payment['id']);
-            $this->banker->setDataValue('stitky', 'PREPLATEK');
+            $this->banker->setDataValue('stitky',
+                $this->config['LABEL_PREPLATEK']);
             $this->banker->insertToFlexiBee();
         }
 
@@ -387,8 +410,9 @@ class ParovacFaktur extends \Ease\Sand
 
         if ($zaloha->sparujPlatbu($platba, 'castecnaUhrada')) {
             $success = 1;
-            $zaloha->addStatusMessage(sprintf(_('Platba %s  %s byla sparovana s zalohou %s'),
+            $zaloha->addStatusMessage(sprintf(_('Platba %s  %s %s byla sparovana s zalohou %s'),
                     \FlexiPeeHP\FlexiBeeRO::uncode($platba), $prijataCastka,
+                    \FlexiPeeHP\FlexiBeeRO::uncode($payment['mena']),
                     (string) $zaloha), 'success');
 
             if ($zaloha->getDataValue('zbyvaUhradit') > $prijataCastka) { // Castecna Uhrada
@@ -499,7 +523,7 @@ class ParovacFaktur extends \Ease\Sand
      * Provede "Zaplacení" vydané faktury
      *
      * @param \FlexiPeeHP\FakturaVydana $invoice Invoice to settle
-     * @param \FlexiPeeHP\Banka $payment Payment to settle by
+     * @param \FlexiPeeHP\Banka         $payment Payment to settle by
      *
      * @return int vysledek 0 = chyba, 1 = sparovano
      */
@@ -511,18 +535,24 @@ class ParovacFaktur extends \Ease\Sand
         $zbyvaUhradit  = $invoice->getDataValue('zbyvaUhradit');
 
         if ($prijataCastka < $zbyvaUhradit) { //Castecna uhrada
-            $this->addStatusMessage(sprintf(_('Castecna uhrada - FAKTURA: prijato: %s ma byt zaplaceno %s'),
-                    $prijataCastka, $zbyvaUhradit), 'warning');
+            $this->addStatusMessage(sprintf(_('Castecna uhrada - FAKTURA: prijato: %s %s ma byt zaplaceno %s %s'),
+                    $prijataCastka,
+                    \FlexiPeeHP\FlexiBeeRO::uncode($payment->getDataValue('mena')),
+                    $zbyvaUhradit,
+                    \FlexiPeeHP\FlexiBeeRO::uncode($invoice->getDataValue('mena'))),
+                'warning');
             $zbytek = 'castecnaUhrada';
         }
         if ($prijataCastka > $zbyvaUhradit) { //Castecna uhrada
-            $this->addStatusMessage(sprintf(_('Přeplatek - FAKTURA: prijato: %s ma byt zaplaceno %s'),
-                    $prijataCastka, $invoice->getDataValue('zbyvaUhradit')),
+            $this->addStatusMessage(sprintf(_('Přeplatek - FAKTURA: prijato: %s %s ma byt zaplaceno %s %s'),
+            $prijataCastka, \FlexiPeeHP\FlexiBeeRO::uncode($payment->getDataValue('mena')),
+            $zbyvaUhradit, \FlexiPeeHP\FlexiBeeRO::uncode($invoice->getDataValue('mena'))),
                 'warning');
 
             $this->banker->dataReset();
             $this->banker->setDataValue('id', $payment->getDataValue('id'));
-            $this->banker->setDataValue('stitky', 'PREPLATEK');
+            $this->banker->setDataValue('stitky',
+                $this->config['LABEL_PREPLATEK']);
             $this->banker->insertToFlexiBee();
             $zbytek = 'ignorovat';
         }
@@ -530,9 +560,10 @@ class ParovacFaktur extends \Ease\Sand
         if ($invoice->sparujPlatbu($payment, $zbytek)) { //Jak se ma FlexiBee zachovat pri preplatku/nedoplatku
             $success = 1;
             $invoice->insertToFlexiBee(['id' => (string) $invoice, 'stavMailK' => 'stavMail.odeslat']);
-            $invoice->addStatusMessage(sprintf(_('Platba %s  %s byla sparovana s fakturou %s'),
+            $invoice->addStatusMessage(sprintf(_('Platba %s  %s %s byla sparovana s fakturou %s'),
                     \FlexiPeeHP\FlexiBeeRO::uncode($payment->getRecordIdent()),
                     $prijataCastka,
+                    \FlexiPeeHP\FlexiBeeRO::uncode($payment->getDataValue('mena')),
                     \FlexiPeeHP\FlexiBeeRO::uncode($invoice->getRecordIdent())),
                 'success');
         }
@@ -656,14 +687,16 @@ class ParovacFaktur extends \Ease\Sand
         if (empty($paymentData['varSym']) && empty($paymentData['specSym'])) {
             $this->banker->dataReset();
             $this->banker->setDataValue('id', $paymentData['id']);
-            $this->banker->setDataValue('stitky', 'NEIDENTIFIKOVANO');
+            $this->banker->setDataValue('stitky',
+                $this->config['LABEL_NEIDENTIFIKOVANO']);
             $this->addStatusMessage(_('Neidentifikovaná platba').': '.self::apiUrlToLink($this->banker->apiURL),
                 'warning');
             $this->banker->insertToFlexiBee();
         } elseif (count($invoices) == 0) {
             $this->banker->dataReset();
             $this->banker->setDataValue('id', $paymentData['id']);
-            $this->banker->setDataValue('stitky', 'CHYBIFAKTURA');
+            $this->banker->setDataValue('stitky',
+                $this->config['LABEL_CHYBIFAKTURA']);
             $this->addStatusMessage(_('Platba bez faktury').': '.self::apiUrlToLink($this->banker->apiURL),
                 'warning');
             $this->banker->insertToFlexiBee();
@@ -727,6 +760,8 @@ class ParovacFaktur extends \Ease\Sand
             'id',
             'varSym',
             'specSym',
+            'zbyvaUhradit',
+            'mena',
             'buc',
             'kod',
             'typDokl(typDoklK,kod)',
@@ -758,6 +793,7 @@ class ParovacFaktur extends \Ease\Sand
             'specSym',
             'buc',
             'sumCelkem',
+            'mena',
             'stitky',
             'datVyst'],
             ["(".\FlexiPeeHP\FlexiBeeRO::flexiUrl($what, 'or').") AND sparovano eq 'false'"],

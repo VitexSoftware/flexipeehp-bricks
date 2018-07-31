@@ -75,7 +75,8 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     protected function setUp()
     {
-        $this->object = new ParovacFaktur();
+        $this->object = new ParovacFaktur(["LABEL_PREPLATEK" => 'PREPLATEK', "LABEL_CHYBIFAKTURA" => 'CHYBIFAKTURA',
+            "LABEL_NEIDENTIFIKOVANO" => 'NEIDENTIFIKOVANO']);
     }
 
     /**
@@ -91,7 +92,7 @@ class ParovacFakturTest extends \Test\Ease\SandTest
     {
         $this->assertArrayHasKey('FAKTURA', $this->object->getDocumentTypes());
     }
-    
+
     /**
      * @covers FlexiPeeHP\Bricks\ParovacFaktur::setStartDay
      */
@@ -129,19 +130,19 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function testInvoicesMatchingByBank()
     {
-        $faktura        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('FAKTURA'),
+        $faktura         = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('FAKTURA'),
             'popis' => 'InvoicesMatchingByBank FlexiPeeHP-Bricks Test']);
-        $zaloha        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ZÁLOHA'),
+        $zaloha          = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ZÁLOHA'),
             'popis' => 'InvoicesMatchingByBank FlexiPeeHP-Bricks Test']);
         $dobropis        = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('DOBROPIS'),
             'popis' => 'InvoicesMatchingByBank FlexiPeeHP-Bricks Test']);
         $this->object->setStartDay(-1);
-        $this->object->invoicesMatchingByBank();
+        $this->object->outInvoicesMatchingByBank();
         $this->object->setStartDay(1);
         $paymentChecker  = new \FlexiPeeHP\Banka(null,
             ['detail' => 'custom:sparovano']);
         $paymentsToCheck = $this->object->getPaymentsToProcess(1);
-        $this->object->invoicesMatchingByBank();
+        $this->object->outInvoicesMatchingByBank();
         foreach ($paymentsToCheck as $paymentID => $paymentData) {
             $paymentChecker->loadFromFlexiBee($paymentID);
             $this->assertEquals('true',
@@ -267,7 +268,7 @@ class ParovacFakturTest extends \Test\Ease\SandTest
             $invoiceSs);
 
         $this->assertTrue(is_object($bestSSPayment));
-        
+
         $invoiceVs     = $this->makeInvoice(['varSym' => $varSym]);
         $paymentVs     = $this->makePayment(['varSym' => $varSym]);
         $bestVSPayment = $this->object->findBestPayment([$paymentVs->getData()],
@@ -278,7 +279,8 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      * @covers FlexiPeeHP\Bricks\ParovacFaktur::apiUrlToLink
      */
     public function testApiUrlToLink()
-    { 
-        $this->assertEquals('<a href="'.constant('FLEXIBEE_URL').'/c/'.constant('FLEXIBEE_COMPANY').'/banka.json" target="_blank" rel="nofollow">https://demo.flexibee.eu:5434/c/demo/banka.json</a>',  $this->object->apiUrlToLink($this->object->banker->apiURL));
+    {
+        $this->assertEquals('<a href="'.constant('FLEXIBEE_URL').'/c/'.constant('FLEXIBEE_COMPANY').'/banka.json" target="_blank" rel="nofollow">https://demo.flexibee.eu:5434/c/demo/banka.json</a>',
+            $this->object->apiUrlToLink($this->object->banker->apiURL));
     }
 }
