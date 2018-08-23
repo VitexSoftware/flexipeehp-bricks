@@ -24,7 +24,7 @@ class ConnectionForm extends \Ease\TWB\Form
      * FlexiBee User Input name
      * @var string eg. winstrom
      */
-    public $usernameField = 'user';
+    public $usernameField = 'login';
 
     /**
      * FlexiBee Password Input name

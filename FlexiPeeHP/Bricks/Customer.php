@@ -1,10 +1,11 @@
 <?php
 /**
- * FlexiPeeHP - WebHook reciever
+ * FlexiPeeHP Bricks - Customer Class
  *
  * @author     Vítězslav Dvořák <info@vitexsofware.cz>
- * @copyright  (G) 2017 Vitex Software
+ * @copyright  (G) 2017-2018 Vitex Software
  */
+
 namespace FlexiPeeHP\Bricks;
 
 /**
@@ -21,13 +22,13 @@ class Customer extends \Ease\User
     public $adresar = null;
 
     /**
-     *
+     * Contact
      * @var \FlexiPeeHP\Kontakt
      */
     public $kontakt = null;
 
     /**
-     * Fakturovač
+     * Invoice Issued
      * @var \FlexiPeeHP\FakturaVydana
      */
     public $invoicer = null;
@@ -75,14 +76,14 @@ class Customer extends \Ease\User
             if (isset($userID['email'])) {
                 $contactInfo = $this->kontakt->getColumnsFromFlexiBee('*',
                     ['email' => $userID['email']]);
-                if (!is_null($contactInfo)) {
+                if (!empty($contactInfo)) {
                     $this->kontakt->takeData($contactInfo[0]);
                     $this->takeData($contactInfo[0]);
                     $this->origin = 'kontakt';
                 } else {
                     $contactInfo = $this->adresar->getColumnsFromFlexiBee('*',
                         ['email' => $userID['email']]);
-                    if (!is_null($contactInfo)) {
+                    if (!empty($contactInfo)) {
                         $this->adresar->takeData($contactInfo);
                         $this->takeData($contactInfo);
                         $this->origin = 'adresar';
@@ -182,7 +183,7 @@ class Customer extends \Ease\User
             'mena',
             'zamekK',
             'datVyst'],
-            ["(stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false AND firma=".$firma],
+            ["(stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false AND firma='".$firma."'"],
             'id');
 
         if ($this->invoicer->lastResponseCode == 200) {
