@@ -178,12 +178,13 @@ class Customer extends \Ease\User
             'specSym',
             'sumCelkem',
             'duzpPuv',
-            'typDokl',
+            'typDokl(typDoklK,kod)',
             'datSplat',
+            'zbyvaUhradit',
             'mena',
             'zamekK',
             'datVyst'],
-            ["(stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false AND firma='".$firma."'"],
+            ["(stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND zamekK = 'zamek.otevreno' AND storno eq false AND firma=".$firma],
             'id');
 
         if ($this->invoicer->lastResponseCode == 200) {

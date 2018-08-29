@@ -39,6 +39,7 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | [config.php](src/config.php)                                  | Ukázka konfiguračního souboru 
 | [CurrencyExchange.php](src/CurrencyExchange.php)              | Funkce pro směnu měny v záznamu 
 | [getpdf.php](src/getpdf.php)                                  | Vrací PDF verzi dokumentu  
+| [parse-cmdline.php](src/parse-cmdline.php)                    | Parser parametrů příkazové řádky
 | [RegisterAddress.php](src/RegisterAddress.php)                | Ukázka použití registračního formuláře
 | [UpomenNeplatice.php](src/UpomenNeplatice.php)                | Rozešle neplatičům upomínky
 | [webhook.php](src/RegisterAddress.php)                        | Endpoint pro příjem WebHooků
@@ -47,26 +48,32 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 
 | Soubor                                                        | Popis                                 |
 | ------------------------------------------------------------- | --------------------------------------|
-| [Customer.php](FlexiPeeHP/Bricks/Customer.php)| Zákazník
-| [HookReciever.php](FlexiPeeHP/Bricks/HookReciever.php)| Příjmač WebHooků
-| [PotvrzeniUhrady.php](FlexiPeeHP/Bricks/HookReciever.php)| Třída potvrzující došlou úhradu
-| [Upominac.php](FlexiPeeHP/Bricks/HookReciever.php)| Třída upomínající neplatiče
-| [Upominka.php](FlexiPeeHP/Bricks/Upominka.php)| Třída upomínky pro neplatiče
-| [ParovacFaktur.php](FlexiPeeHP/Bricks/ParovacFaktur.php)| Párovač faktur
+| [Convertor.php](src/FlexiPeeHP/Bricks/Convertor.php)          | Konvertor dokladů
+| [Customer.php](src/FlexiPeeHP/Bricks/Customer.php)            | Zákazník
+| [HookReciever.php](src/FlexiPeeHP/Bricks/HookReciever.php)    | Příjmač WebHooků
+| [PotvrzeniUhrady.php](src/FlexiPeeHP/Bricks/HookReciever.php) | Třída potvrzující došlou úhradu
+| [Upominac.php](src/FlexiPeeHP/Bricks/HookReciever.php)        | Třída upomínající neplatiče
+| [Upominka.php](src/FlexiPeeHP/Bricks/Upominka.php)            | Třída upomínky pro neplatiče
+| [ParovacFaktur.php](src/FlexiPeeHP/Bricks/ParovacFaktur.php)  | Párovač faktur
 
 # Třídy v FlexiPeeHP/Bricks/ui:
 
 | Soubor                                                        | Popis                                 |
 | ------------------------------------------------------------- | --------------------------------------|
-| [AddressRegisterForm.php](FlexiPeeHP/Bricks/ui/AddressRegisterForm.php)| Registrační formulář
-| [EmbedResponsiveHTML.php](FlexiPeeHP/Bricks/ui/EmbedResponsiveHTML.php)| Třída pro zobrazení HTML dokumentu na stránce 
-| [EmbedResponsivePDF.php](FlexiPeeHP/Bricks/ui/EmbedResponsivePDF.php)  | Třída pro zobrazení PDF dokumentu na stránce 
-| [RecordTypeSelect.php](FlexiPeeHP/Bricks/ui/RecordTypeSelect.php)      | Nabídka pro výběr typu dokumnetu 
-| [StatusInfoBox.php](FlexiPeeHP/Bricks/ui/StatusInfoBox.php)            | Info widget o stavu připojení
+| [AdresarForm.php](src/FlexiPeeHP/Bricks/ui/AdresarForm.php)   | Editační formulář adresy
+| [KontaktForm.php](src/FlexiPeeHP/Bricks/ui/KontaktForm.php)   | Editační formulář kontaktu adresy
+| [EmbedResponsiveHTML.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsiveHTML.php)| Třída pro zobrazení HTML dokumentu na stránce 
+| [EmbedResponsivePDF.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsivePDF.php)  | Třída pro zobrazení PDF dokumentu na stránce 
+| [RecordTypeSelect.php](src/FlexiPeeHP/Bricks/ui/RecordTypeSelect.php)      | Nabídka pro výběr typu dokumnetu 
+| [StatusInfoBox.php](src/FlexiPeeHP/Bricks/ui/StatusInfoBox.php)            | Info widget o stavu připojení
 
 
 Ukázky ve složce [Examples](Examples)
 =====================================
+
+Editor Adresy: [addresseditor.php](Examples/addresseditor.php)
+
+![Výpis](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/addresseditor.png)
 
 Výpis faktur do stránky: [invoices.php](Examples/invoices.php)
 

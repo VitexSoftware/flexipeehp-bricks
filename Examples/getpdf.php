@@ -8,7 +8,7 @@
 require_once '../vendor/autoload.php';
 
 $oPage = new \Ease\WebPage();
-\Ease\Shared::instanced()->loadConfig(dirname(__DIR__).'/tests/client.json');
+\Ease\Shared::instanced()->loadConfig(dirname(__DIR__).'/tests/client.json',true);
 
 
 $embed    = $oPage->getRequestValue('embed');

@@ -66,10 +66,10 @@ class Upominka extends \FlexiPeeHP\FlexiBeeRW
             $sumCelkem = 0;
             $invoices  = [];
             foreach ($clientDebts as $debt) {
-                $sumCelkem += $debt['sumCelkem'];
+                $sumCelkem += $debt['zbyvaUhradit'];
 
                 $ddiff      = Upominac::poSplatnosti($debt['datSplat']);
-                $invoices[] = $debt['kod'].' v.s.: '.$debt['varSym'].' '.$debt['sumCelkem'].' '.str_replace('code:',
+                $invoices[] = $debt['kod'].' v.s.: '.$debt['varSym'].' '.$debt['zbyvaUhradit'].' '.str_replace('code:',
                         '',
                         $debt['mena'].'  '.\FlexiPeeHP\FlexiBeeRO::flexiDateToDateTime($debt['datSplat'])->format('d.m.Y').' ('.$ddiff.' dní po splatnosti)');
             }

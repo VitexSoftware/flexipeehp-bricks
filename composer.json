@@ -13,8 +13,8 @@
     },
     "autoload": {
         "psr-4": {
-            "FlexiPeeHP\\Bricks\\": "FlexiPeeHP/Bricks",
-            "FlexiPeeHP\\ui\\": "FlexiPeeHP/ui"
+            "FlexiPeeHP\\Bricks\\": "src/FlexiPeeHP/Bricks",
+            "FlexiPeeHP\\ui\\": "src/FlexiPeeHP/ui"
         }
     },
     "autoload-dev": {

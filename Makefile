@@ -18,7 +18,7 @@ clean:
 
 doc:
 	VERSION=`cat debian/composer.json | grep version | awk -F'"' '{print $4}'`; \
-	apigen generate --source FlexiPeeHP --destination docs --title "FlexiPeeHP-Bricks ${VERSION}" --charset UTF-8 --access-levels public --access-levels protected --php --tree
+	php5 -f /usr/bin/apigen generate --source FlexiPeeHP --destination docs --title "FlexiPeeHP-Bricks ${VERSION}" --charset UTF-8 --access-levels public --access-levels protected --php --tree
 
 test:
 	composer update
@@ -28,7 +28,7 @@ changelog:
 	CHANGES=`git log -n 1 | tail -n+5` ; dch -b -v `cat debian/version`-`cat debian/revision` --package flexipeehp-bricks "$(CHANGES)"
 
 deb: changelog
-	debuild -i -us -uc -b
+	dpkg-buildpackage -A -us -uc
 
 rpm:
 	rpmdev-bumpspec --comment="Build" --userstring="Vítězslav Dvořák <info@vitexsoftware.cz>" flexipeehp-bricks.spec

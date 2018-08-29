@@ -1,6 +1,6 @@
 <?php
 /**
- * FlexiPeeHP - Example how to show connection check InfoBox
+ * FlexiPeeHP Bricks - Example how to show connection check InfoBox
  *
  * @author     Vítězslav Dvořák <info@vitexsofware.cz>
  * @copyright  (G) 2017 Vitex Software
