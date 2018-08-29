@@ -51,9 +51,6 @@ class AdresarForm extends \Ease\TWB\Form
             get_class($address)));
 //        $this->addItem(new \Ease\Html\InputHiddenTag('enquiry_id', $address->getDataValue('enquiry_id')));
 
-        $this->addItem(new \Ease\Html\DivTag(new \Ease\TWB\SubmitButton(_('Save'),
-            'success'), ['style' => 'text-align: right']));
-
         if (!is_null($addressID)) {
             $this->addItem(new \Ease\Html\InputHiddenTag($address->keyColumn,
                 $addressID));

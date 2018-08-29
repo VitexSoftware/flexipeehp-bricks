@@ -27,7 +27,7 @@ class KontaktForm extends \Ease\TWB\Form
         parent::__construct('contact'.$contactID);
 
         $this->addInput(new \Ease\Html\InputTag('jmeno',
-            $contact->getDataValue('jmeno')), _('Jméno'));
+            $contact->getDataValue('jmeno')), _('Name'));
         $this->addInput(new \Ease\Html\InputTag('prijmeni',
             $contact->getDataValue('prijmeni')), _('Surname'));
         $this->addInput(new \Ease\Html\InputTag('email',
@@ -46,10 +46,6 @@ class KontaktForm extends \Ease\TWB\Form
 
         $this->addItem(new \Ease\Html\InputHiddenTag('class',
             get_class($contact)));
-//        $this->addItem(new \Ease\Html\InputHiddenTag('enquiry_id', $contact->getDataValue('enquiry_id')));
-
-        $this->addItem(new \Ease\Html\DivTag(new \Ease\TWB\SubmitButton(_('Save'),
-            'success'), ['style' => 'text-align: right']));
 
         if (!is_null($contactID)) {
             $this->addItem(new \Ease\Html\InputHiddenTag($contact->keyColumn,

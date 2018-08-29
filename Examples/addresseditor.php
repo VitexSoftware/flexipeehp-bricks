@@ -31,6 +31,8 @@ if (empty($addressId)) {
     }
 
     $form = new ui\AdresarForm($adresser);
+    $form->addItem(new \Ease\Html\DivTag(new \Ease\TWB\SubmitButton(_('Save'),
+        'success'), ['style' => 'text-align: right']));
 }
 
 
