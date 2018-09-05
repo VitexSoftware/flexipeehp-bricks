@@ -87,6 +87,8 @@ class ParovacFaktur extends \Ease\Sand
             'varSym',
             'specSym',
             'sumCelkem',
+            'buc',
+            'smerKod',
             'mena',
             'datVyst'],
             ["sparovano eq false AND typPohybuK eq '".(($direction == 'out') ? 'typPohybu.vydej'
@@ -128,6 +130,8 @@ class ParovacFaktur extends \Ease\Sand
         $payments = $this->banker->getColumnsFromFlexibee([
             'id',
             'kod',
+            'buc',
+            'smerKod',
             'varSym',
             'specSym',
             'sumCelkem',
@@ -226,18 +230,19 @@ class ParovacFaktur extends \Ease\Sand
                      *    Pohyb Kč / Zůstatek Kč (typBanUctu.kc)
                      *    Pohyb měna / Zůstatek měna (typBanUctu.mena)
                      */
-
+                    $matched = false;
                     switch ($docType) {
                         case 'typDokladu.zalohFaktura':
                         case 'typDokladu.faktura':
-                            if ($this->settleInvoice($invoice, $payment)) ;
+                            $matched = $this->settleInvoice($invoice, $payment);
                             break;
                         case 'typDokladu.proforma':
-                            if ($this->settleProforma($invoice, $paymentData)) ;
+                            $matched = $this->settleProforma($invoice,
+                                $paymentData);
                             break;
                         case 'typDokladu.dobropis':
-                            if ($this->settleCreditNote($invoice, $paymentData))
-                                    ;
+                            $matched = $this->settleCreditNote($invoice,
+                                $paymentData);
                             break;
 
                         default:
@@ -247,6 +252,13 @@ class ParovacFaktur extends \Ease\Sand
                                     $invoice->getApiURL()
                                 ), 'warning');
                             break;
+                    }
+
+                    if ($matched && $this->savePayerAccount($invoice->getDataValue('firma'),
+                            $payment)) {
+                        $this->addStatusMessage(sprintf(_('new Bank account %s assigned to Address %s'),
+                                $payment->getDataValue('buc').'/'.\FlexiPeeHP\FlexiBeeRO::uncode($payment->getDataValue('smerKod')),
+                                $invoice->getDataValue('firma@showAs')));
                     }
 
                     $this->banker->loadFromFlexiBee($paymentData['id']);
@@ -763,12 +775,13 @@ class ParovacFaktur extends \Ease\Sand
         $result                                       = null;
         $this->invoicer->defaultUrlParams['order']    = 'datVyst@A';
         $this->invoicer->defaultUrlParams['includes'] = '/faktura-vydana/typDokl';
-        $payments                                     = $this->invoicer->getColumnsFromFlexibee([
+        $invices                                      = $this->invoicer->getColumnsFromFlexibee([
             'id',
             'varSym',
             'specSym',
             'zbyvaUhradit',
             'mena',
+            'firma',
             'buc',
             'kod',
             'typDokl(typDoklK,kod)',
@@ -871,5 +884,54 @@ class ParovacFaktur extends \Ease\Sand
         $documentType = \FlexiPeeHP\FlexiBeeRO::uncode($typDokl);
         return array_key_exists($documentType, $this->docTypes) ? $this->docTypes[$documentType]
                 : 'typDokladu.neznamy';
+    }
+
+    /**
+     * Assign Bank Account to Address 
+     * 
+     * @param \FlexiPeeHP\Adresar|string $payer    Object or code: identier
+     * @param \FlexiPeeHP\Banka          $payment  Payment object
+     * 
+     * @return boolean account was assigned to Address
+     */
+    public function savePayerAccount($payer, $payment)
+    {
+        $result = null;
+        $buc    = $payment->getDataValue('buc');
+        if (!empty($buc) && !empty($payer) && $this->isKnownBankAccountForAddress($payer, $buc)) {
+            $result = $this->assignBankAccountToAddress($payer, $payment);
+}
+        return $result;
+    }
+
+    public function isKnownBankAccountForAddress($address, $buc)
+    {
+        $result      = null;
+        $accounts    = [];
+        $bucer       = new \FlexiPeeHP\FlexiBeeRW(null,
+            ['evidence' => 'adresar-bankovni-ucet']);
+        $accountsRaw = $bucer->getColumnsFromFlexibee(['buc', 'smerKod'],
+            ['firma' => $address]);
+        if (!empty($accountsRaw)) {
+            $accounts = self::reindexArrayBy($accountsRaw, 'buc');
+        }
+        return !array_key_exists($buc, $accounts);
+    }
+
+    /**
+     * Assign Bank Account to Address
+     * 
+     * @param \FlexiPeeHP\Adresar|string $address Object or code: identier
+     * @param \FlexiPeeHP\Banka                   $payment
+     * 
+     * @return boolean added ?
+     */
+    public function assignBankAccountToAddress($address, $payment)
+    {
+        $bucer = new \FlexiPeeHP\FlexiBeeRW(null,
+            ['evidence' => 'adresar-bankovni-ucet']);
+        $bucer->insertToFlexiBee(['firma' => $address, 'buc' => $payment->getDataValue('buc'),
+            'smerKod' => $payment->getDataValue('smerKod'), 'poznam' => _('Added by script')]);
+        return $bucer->lastResponseCode == 201;
     }
 }

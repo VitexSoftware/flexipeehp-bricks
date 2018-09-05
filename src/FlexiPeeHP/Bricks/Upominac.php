@@ -275,7 +275,7 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
         $stitkyRaw = $this->customer->adresar->getColumnsFromFlexiBee(['stitky'],
             ['id' => $addressID]);
         $stitky    = $stitkyRaw[0]['stitky'];
-        if (count($debts)) {
+        if (!empty($debts)) {
             foreach ($debts as $did => $debt) {
                 $ddiff = self::poSplatnosti($debt['datSplat']);
 
@@ -296,7 +296,7 @@ class Upominac extends \FlexiPeeHP\FlexiBeeRW
             $score = 2;
         }
 
-        if (!strstr($stitky, 'UPOMINKA1') && count($debts)) {
+        if (!strstr($stitky, 'UPOMINKA1') && !empty($debts)) {
             $score = 1;
         }
 
