@@ -48,7 +48,7 @@ class ParovacFaktur extends \Ease\Sand
         foreach ($this->cfgRequed as $key) {
             if ((array_key_exists($key, $this->config) === false) || empty($this->config[$key])) {
                 throw new \Ease\Exception(sprintf(_('Configuration key %s is not set'),
-                    $key));
+                        $key));
             }
         }
         parent::__construct();
@@ -92,10 +92,10 @@ class ParovacFaktur extends \Ease\Sand
             'mena',
             'datVyst'],
             ["sparovano eq false AND typPohybuK eq '".(($direction == 'out') ? 'typPohybu.vydej'
-                : 'typPohybu.prijem' )."' AND storno eq false ".
-            (is_null($daysBack) ? '' :
-            "AND datVyst eq '".\FlexiPeeHP\FlexiBeeRW::timestampToFlexiDate(mktime(0,
-                    0, 0, date("m"), date("d") - $daysBack, date("Y")))."' ")
+                    : 'typPohybu.prijem' )."' AND storno eq false ".
+                (is_null($daysBack) ? '' :
+                "AND datVyst eq '".\FlexiPeeHP\FlexiBeeRW::timestampToFlexiDate(mktime(0,
+                        0, 0, date("m"), date("d") - $daysBack, date("Y")))."' ")
             ], 'id');
 
         if ($this->banker->lastResponseCode == 200) {
@@ -284,35 +284,106 @@ class ParovacFaktur extends \Ease\Sand
     public function inInvoicesMatchingByBank(\DatePeriod $range = null)
     {
         $this->invoicer = new \FlexiPeeHP\FakturaPrijata(null, $this->config);
-        foreach ($this->getPaymentsWithinPeriod($range, 'out') as $paymentId => $paymentData) {
-            $this->banker->setMyKey($paymentId);
-            $this->addStatusMessage(sprintf('Processing Payment %s %s %s vs: %s ss: %s %s',
-                    $paymentData['kod'], $paymentData['sumCelkem'],
-                    \FlexiPeeHP\FlexiBeeRO::uncode($paymentData['mena']),
-                    $paymentData['varSym'], $paymentData['specSym'],
+        foreach ($this->getPaymentsWithinPeriod($range, 'out') as $outPaymentId => $outPaymentData) {
+            $this->banker->setMyKey($outPaymentId);
+            $this->addStatusMessage(sprintf('Processing Outcoming Payment %s %s %s vs: %s ss: %s %s',
+                    $outPaymentData['kod'], $outPaymentData['sumCelkem'],
+                    \FlexiPeeHP\FlexiBeeRO::uncode($outPaymentData['mena']),
+                    $outPaymentData['varSym'], $outPaymentData['specSym'],
                     $this->banker->getApiURL()), 'info');
 
 
-            $invoices = $this->findInvoices($paymentData);
+            $inInvoicesToMatch = $this->findInvoices($outPaymentData);
 //  kdyz se vrati jedna faktura:
 //     kdyz  je prijata castka mensi nebo rovno tak zlikviduji celou
 //     kdyz sedi castka, nebo castecne
 //  kdyz se vrati vic faktur  tak kdyz sedi castka uhrazuje se ta nejstarsi
 //  jinak se uhrazuje castecne
 
-            if (count($invoices) && count(current($invoices))) {
-                $prijatoCelkem = floatval($paymentData['sumCelkem']);
-                $payment       = new \FlexiPeeHP\Banka($paymentData,
-                    $this->config);
+            $this->banker->setData($outPaymentData, true);
 
-                foreach ($invoices as $invoiceID => $invoiceData) {
-                    $invoice = new \FlexiPeeHP\FakturaVydana($invoiceData,
+            switch (count($inInvoicesToMatch)) {
+                case 0:
+                    $this->addStatusMessage(_('No incoming invoice found for outcoming payment'));
+                    break;
+                case 1:
+                    $invoiceData = current($inInvoicesToMatch);
+                    $invoiceID   = key($inInvoicesToMatch);
+                    $inInvoice   = new \FlexiPeeHP\FakturaVydana($invoiceData,
                         array_merge($this->config,
                             ['evidence' => 'faktura-prijata']));
-                    if ($this->settleInvoice($invoice, $payment)) ;
-                }
+                    if ($this->settleInvoice($inInvoice, $this->banker)) {
+                        //Post match action here
+                    }
+                    break;
+                default :
+                    if (self::isSameCompany($inInvoicesToMatch)) {
+                        foreach ($inInvoicesToMatch as $invoiceID => $invoiceData) {
+                            $inInvoice = new \FlexiPeeHP\FakturaVydana($invoiceData,
+                                array_merge($this->config,
+                                    ['evidence' => 'faktura-prijata']));
+                            if ($this->settleInvoice($inInvoice, $this->payment)) {
+                                //Post match action here
+                            }
+                        }
+                    } else {
+                        $this->addStatusMessage(_('Match by bank here'));
+                        foreach ($inInvoicesToMatch as $invoiceID => $invoiceData) {
+                            $inInvoice = new \FlexiPeeHP\FakturaVydana($invoiceData,
+                                array_merge($this->config,
+                                    ['evidence' => 'faktura-prijata']));
+                        }
+                    }
+                    break;
+            }
+
+
+            if (count($inInvoicesToMatch) && count(current($inInvoicesToMatch))) {
+                $uhrazenoCelkem = floatval($outPaymentData['sumCelkem']);
+                $payment        = new \FlexiPeeHP\Banka($outPaymentData,
+                    $this->config);
             }
         }
+    }
+
+    /**
+     * Obtain FlexiBee company code for given bank account number
+     * 
+     * @param string $account
+     * @param string $bankCode
+     * 
+     * @return string Company Code
+     */
+    public function getCompanyForBUC($account, $bankCode = null)
+    {
+        $bucer = new \FlexiPeeHP\FlexiBeeRW(null,
+            ['evidence' => 'adresar-bankovni-ucet']);
+        $companyRaw = $bucer->getColumnsFromFlexibee(['firma'],empty($bankCode) ? ['buc'=>$account] : ['buc'=>$account,'smerKod'=>$bankCode]);
+        return array_key_exists(0, $companyRaw) ? $companyRaw[0]['firma'] : null;
+    }
+
+    /**
+     * Check for common company
+     * 
+     * @param array $documents invoices or payments data
+     * 
+     * @return boolean All records have same company
+     */
+    public static function isSameCompany($documents)
+    {
+        return count(self::reindexArrayBy($documents, 'firma')) == 1;
+    }
+
+    /**
+     * Check for common bank account
+     * 
+     * @param array $documents invoices or payments data
+     * 
+     * @return boolean All records have same bank account
+     */
+    public static function isSameAccount($documents)
+    {
+        return count(self::reindexArrayBy($documents, 'buc')) == 1;
     }
 
     /**
@@ -775,7 +846,7 @@ class ParovacFaktur extends \Ease\Sand
         $result                                       = null;
         $this->invoicer->defaultUrlParams['order']    = 'datVyst@A';
         $this->invoicer->defaultUrlParams['includes'] = '/faktura-vydana/typDokl';
-        $invices                                      = $this->invoicer->getColumnsFromFlexibee([
+        $invoices                                     = $this->invoicer->getColumnsFromFlexibee([
             'id',
             'varSym',
             'specSym',
@@ -791,7 +862,7 @@ class ParovacFaktur extends \Ease\Sand
             ["(".\FlexiPeeHP\FlexiBeeRO::flexiUrl($what, 'or').") AND (stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false"],
             'id');
         if ($this->invoicer->lastResponseCode == 200) {
-            $result = $payments;
+            $result = $invoices;
         }
         unset($this->invoicer->defaultUrlParams['includes']);
         return $result;
@@ -898,9 +969,10 @@ class ParovacFaktur extends \Ease\Sand
     {
         $result = null;
         $buc    = $payment->getDataValue('buc');
-        if (!empty($buc) && !empty($payer) && $this->isKnownBankAccountForAddress($payer, $buc)) {
+        if (!empty($buc) && !empty($payer) && $this->isKnownBankAccountForAddress($payer,
+                $buc)) {
             $result = $this->assignBankAccountToAddress($payer, $payment);
-}
+        }
         return $result;
     }
 
