@@ -155,33 +155,9 @@ class ParovacFaktur extends \Ease\Sand
      */
     public function getInvoicesToProcess()
     {
-        $result                                       = [];
-        $this->invoicer->defaultUrlParams['order']    = 'datVyst@A';
         $this->invoicer->defaultUrlParams['includes'] = '/faktura-vydana/typDokl';
-        $invoices                                     = $this->invoicer->getColumnsFromFlexibee([
-            'id',
-            'kod',
-            'stavUhrK',
-            'zbyvaUhradit',
-            'firma',
-            'buc',
-            'mena',
-            'varSym',
-            'specSym',
-            'typDokl(typDoklK,kod)',
-            'sumCelkem',
-            'duzpPuv',
-            'typDokl',
-            'datVyst'],
-            ["(stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false"],
-            'id');
-
-        if ($this->invoicer->lastResponseCode == 200) {
-            $result = $invoices;
+        return $this->searchInvoices(["(stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false"]);
         }
-        unset($this->invoicer->defaultUrlParams['includes']);
-        return $result;
-    }
 
     /**
      * Párování odchozích faktur podle příchozích plateb v bance
@@ -267,12 +243,35 @@ class ParovacFaktur extends \Ease\Sand
                     }
                 }
             } else {
-                if (!empty($paymentData['varSym']) || !empty($paymentData['specSym'])) {
-                    $this->addStatusMessage(_('Invoice found: - overdue?')
-                        , 'warning');
+
+                if (!empty($paymentData['varSym'])) {
+                    if (!empty($paymentData['varSym'])) {
+                        $vInvoices = $this->searchInvoices(['varSym' => $paymentData['varSym']]);
+                }
+            }
+                if (!empty($paymentData['specSym'])) {
+                    if (!empty($paymentData['specSym'])) {
+                        $sInvoices = $this->searchInvoices(['specSym' => $paymentData['specSym']]);
+        }
+    }
+
+                if ($vInvoices || $sInvoices) {
+                    $zdd = $this->paymentToZDD($payment);
+                    if ($zdd) {
+                        $this->addStatusMessage(sprinf(_('advance tax document created'),
+                                \FlexiPeeHP\FlexiBeeRO::uncode($zdd)));
+                    }
+
+                    $this->addStatusMessage(_('Invoice found: - overdue?'),
+                        'warning');
                 }
             }
         }
+    }
+
+    public function paymentToZDD($invoiceData)
+    {
+        $return = $this->invoiceCopy($invoiceData, 'ZDD');
     }
 
     /**
@@ -772,26 +771,42 @@ class ParovacFaktur extends \Ease\Sand
      */
     public function findInvoice($what)
     {
+        return $this->searchInvoices(["(".\FlexiPeeHP\FlexiBeeRO::flexiUrl($what,
+                    'or').") AND (stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false"]);
+    }
+
+    /**
+     * Vrací neuhrazene faktury odpovídající zadaným parametrům
+     *
+     * @param array $what
+     * 
+     * @return array
+     */
+    public function searchInvoices($what)
+    {
         $result                                       = null;
         $this->invoicer->defaultUrlParams['order']    = 'datVyst@A';
         $this->invoicer->defaultUrlParams['includes'] = '/faktura-vydana/typDokl';
-        $invices                                      = $this->invoicer->getColumnsFromFlexibee([
+        $invoices                                      = $this->invoicer->getColumnsFromFlexibee([
             'id',
-            'varSym',
-            'specSym',
+            'kod',
+            'stavUhrK',
             'zbyvaUhradit',
-            'mena',
             'firma',
             'buc',
-            'kod',
+            'mena',
+            'varSym',
+            'specSym',
             'typDokl(typDoklK,kod)',
             'sumCelkem',
+            'duzpPuv',
             'stitky',
-            'datVyst'],
-            ["(".\FlexiPeeHP\FlexiBeeRO::flexiUrl($what, 'or').") AND (stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false"],
-            'id');
+            'typDokl',
+            'datVyst'
+            ], $what, 'id');
+
         if ($this->invoicer->lastResponseCode == 200) {
-            $result = $payments;
+            $result = $invoices;
         }
         unset($this->invoicer->defaultUrlParams['includes']);
         return $result;
@@ -898,7 +913,8 @@ class ParovacFaktur extends \Ease\Sand
     {
         $result = null;
         $buc    = $payment->getDataValue('buc');
-        if (!empty($buc) && !empty($payer) && $this->isKnownBankAccountForAddress($payer, $buc)) {
+        if (!empty($buc) && !empty($payer) && $this->isKnownBankAccountForAddress($payer,
+                $buc)) {
             $result = $this->assignBankAccountToAddress($payer, $payment);
 }
         return $result;
