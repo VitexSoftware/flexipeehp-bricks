@@ -1,6 +1,12 @@
 # FlexiPeeHP-Bricks
 ![Project Logo](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/project-logo.png "Project Logo")
 
+[![Build Status](https://travis-ci.org/VitexSoftware/Ease-PHP-Bricks.svg?branch=master)](https://travis-ci.org/VitexSoftware/Ease-PHP-Bricks)
+[![GitHub stars](https://img.shields.io/github/stars/VitexSoftware/FlexiPeeHP-Bricks.svg)](https://github.com/VitexSoftware/FlexiPeeHP-Bricks/stargazers)
+[![GitHub issues](https://img.shields.io/github/issues/VitexSoftware/FlexiPeeHP-Bricks.svg)](https://github.com/VitexSoftware/FlexiPeeHP-Bricks/issues)
+[![GitHub license](https://img.shields.io/github/license/VitexSoftware/FlexiPeeHP-Bricks.svg)](https://github.com/VitexSoftware/FlexiPeeHP-Bricks/blob/master/LICENSE)
+[![Twitter](https://img.shields.io/twitter/url/https/github.com/VitexSoftware/FlexiPeeHP-Bricks.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FVitexSoftware%2FFlexiPeeHP-Bricks)
+
 Examples how to use [FlexiPeeHP](https://github.com/Spoje-NET/FlexiPeeHP) Library for FlexiBee with EasePHP Framework widgets
 
 Příklady použití knihovny [FlexiPeeHP](https://github.com/Spoje-NET/FlexiPeeHP) pro [FlexiBee](https://flexibee.eu/)
