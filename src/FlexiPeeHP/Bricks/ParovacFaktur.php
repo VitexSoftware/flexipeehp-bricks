@@ -284,6 +284,7 @@ class ParovacFaktur extends \Ease\Sand
     {
         $this->invoicer = new \FlexiPeeHP\FakturaPrijata(null, $this->config);
         foreach ($this->getPaymentsWithinPeriod($range, 'out') as $outPaymentId => $outPaymentData) {
+            $this->banker->setData($outPaymentData,true);
             $this->banker->setMyKey($outPaymentId);
             $this->addStatusMessage(sprintf('Processing Outcoming Payment %s %s %s vs: %s ss: %s %s',
                     $outPaymentData['kod'], $outPaymentData['sumCelkem'],
@@ -299,7 +300,7 @@ class ParovacFaktur extends \Ease\Sand
 //  kdyz se vrati vic faktur  tak kdyz sedi castka uhrazuje se ta nejstarsi
 //  jinak se uhrazuje castecne
 
-            $this->banker->setData($outPaymentData, true);
+
 
             switch (count($inInvoicesToMatch)) {
                 case 0:
@@ -321,8 +322,8 @@ class ParovacFaktur extends \Ease\Sand
                             $inInvoice = new \FlexiPeeHP\FakturaVydana($invoiceData,
                                 array_merge($this->config,
                                     ['evidence' => 'faktura-prijata']));
-                            if ($this->settleInvoice($inInvoice, $this->payment)) {
-                                //Post match action here
+                            if ($this->settleInvoice($inInvoice,$this->banker)) {
+
                             }
                         }
                     } else {
@@ -355,9 +356,10 @@ class ParovacFaktur extends \Ease\Sand
      */
     public function getCompanyForBUC($account, $bankCode = null)
     {
-        $bucer = new \FlexiPeeHP\FlexiBeeRW(null,
+        $bucer      = new \FlexiPeeHP\FlexiBeeRW(null,
             ['evidence' => 'adresar-bankovni-ucet']);
-        $companyRaw = $bucer->getColumnsFromFlexibee(['firma'],empty($bankCode) ? ['buc'=>$account] : ['buc'=>$account,'smerKod'=>$bankCode]);
+        $companyRaw = $bucer->getColumnsFromFlexibee(['firma'],
+            empty($bankCode) ? ['buc' => $account] : ['buc' => $account, 'smerKod' => $bankCode]);
         return array_key_exists(0, $companyRaw) ? $companyRaw[0]['firma'] : null;
     }
 
@@ -638,11 +640,7 @@ class ParovacFaktur extends \Ease\Sand
                     \FlexiPeeHP\FlexiBeeRO::uncode($invoice->getDataValue('mena'))),
                 'warning');
 
-            $this->banker->dataReset();
-            $this->banker->setDataValue('id', $payment->getDataValue('id'));
-            $this->banker->setDataValue('stitky',
-                $this->config['LABEL_PREPLATEK']);
-            $this->banker->insertToFlexiBee();
+            //$this->banker->insertToFlexiBee(['id'=>$payment->getDataValue('id'), 'stitky'=>$this->config['LABEL_CASTECNAUHRADA']]);
             $zbytek = 'ignorovat';
         }
 
@@ -741,17 +739,17 @@ class ParovacFaktur extends \Ease\Sand
             $sInvoices = $this->findInvoice(['specSym' => $paymentData['specSym']]);
         }
 
-//      DOPSAT
-//      parovani podle cisla uctu
-//        if ($paymentData['buc']) {
-//            $bInvoices = $this->findInvoice(['buc' => $paymentData['buc']]);
-//            foreach ($bInvoices as $invoiceID => $invoice) {
-//                if (!array_key_exists($invoiceID, $invoices)) {
-//                    $invoices[$invoiceID] = $invoice;
-//                }
-//            }
-//        }
-//
+
+
+        if ($paymentData['buc']) {
+            $bInvoices = $this->findInvoice(['buc' => $paymentData['buc']]);
+            foreach ($bInvoices as $invoiceID => $invoice) {
+                if (!array_key_exists($invoiceID, $invoices)) {
+                    $invoices[$invoiceID] = $invoice;
+                }
+            }
+        }
+
 
         if (!empty($vInvoices) && count($vInvoices)) {
             foreach ($vInvoices as $invoiceID => $invoice) {
@@ -858,7 +856,7 @@ class ParovacFaktur extends \Ease\Sand
         $result                                       = null;
         $this->invoicer->defaultUrlParams['order']    = 'datVyst@A';
         $this->invoicer->defaultUrlParams['includes'] = '/faktura-vydana/typDokl';
-        $invoices                                      = $this->invoicer->getColumnsFromFlexibee([
+        $invoices                                     = $this->invoicer->getColumnsFromFlexibee([
             'id',
             'kod',
             'stavUhrK',
