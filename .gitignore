@@ -3,3 +3,9 @@ composer.lock
 /vendor/
 /debian/debhelper-build-stamp
 /clover.log
+/debian/flexipeehp-bricks-doc.debhelper.log
+/debian/flexipeehp-bricks.debhelper.log
+/debian/flexipeehp-bricks-doc.substvars
+/debian/flexipeehp-bricks.substvars
+/debian/flexipeehp-bricks/
+/debian/flexipeehp-bricks-doc/
