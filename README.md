@@ -67,6 +67,7 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | Soubor                                                        | Popis                                 |
 | ------------------------------------------------------------- | --------------------------------------|
 | [AdresarForm.php](src/FlexiPeeHP/Bricks/ui/AdresarForm.php)   | Editační formulář adresy
+| [CompanyLogo.php](src/FlexiPeeHP/Bricks/ui/CompanyLogo.php)   | Logo Firmy
 | [KontaktForm.php](src/FlexiPeeHP/Bricks/ui/KontaktForm.php)   | Editační formulář kontaktu adresy
 | [EmbedResponsiveHTML.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsiveHTML.php)| Třída pro zobrazení HTML dokumentu na stránce 
 | [EmbedResponsivePDF.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsivePDF.php)  | Třída pro zobrazení PDF dokumentu na stránce 
@@ -76,6 +77,10 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 
 Ukázky ve složce [Examples](Examples)
 =====================================
+
+Logo Firmy: [companylogo.php](Examples/companylogo.php)
+
+![Logo](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/companylogo.png)
 
 Editor Adresy: [addresseditor.php](Examples/addresseditor.php)
 
