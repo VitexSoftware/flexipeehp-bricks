@@ -1,10 +1,9 @@
-flexipeehp-bricks (0.9) UNRELEASED; urgency=medium
+flexipeehp-bricks (0.10) UNRELEASED; urgency=medium
 
   * New Order listing widget added
-  * flexipeehp-bricks
-  * flexipeehp-bricks
+  * CompanyLogo added
 
- -- Vítězslav Dvořák <vitex@develoid.jinonice.czf>  Thu, 25 Oct 2018 23:27:56 +0200
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Sun, 28 Oct 2018 23:17:39 +0100
 
 flexipeehp-bricks (0.8) experimental; urgency=low
 

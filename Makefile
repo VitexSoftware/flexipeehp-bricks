@@ -18,7 +18,7 @@ clean:
 
 doc:
 	VERSION=`cat debian/composer.json | grep version | awk -F'"' '{print $$4}'`; \
-	php5.6 -f /usr/bin/apigen generate --source src --destination docs --title "FlexiPeeHP-Bricks ${VERSION}" --charset UTF-8 --access-levels public --access-levels protected --php --tree
+	php -f /usr/bin/apigen generate --source src --destination docs --title "FlexiPeeHP-Bricks ${VERSION}" --charset UTF-8 --access-levels public --access-levels protected --php --tree
 
 test:
 	composer update

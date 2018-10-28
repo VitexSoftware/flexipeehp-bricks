@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 
-	<title>Class FlexiPeeHP\ui\KontaktForm | FlexiPeeHP-Bricks </title>
+	<title>Class FlexiPeeHP\ui\CompanyLogo | FlexiPeeHP-Bricks </title>
 
 	<link rel="stylesheet" href="resources/style.css?c2f33731c1948fbed7c333554678bfa68d4817da">
 
@@ -78,13 +78,13 @@
 			<h3>Classes</h3>
 			<ul>
 				<li><a href="class-FlexiPeeHP.ui.AdresarForm.html">AdresarForm</a></li>
-				<li><a href="class-FlexiPeeHP.ui.CompanyLogo.html">CompanyLogo</a></li>
+				<li class="active"><a href="class-FlexiPeeHP.ui.CompanyLogo.html">CompanyLogo</a></li>
 				<li><a href="class-FlexiPeeHP.ui.ConnectionForm.html">ConnectionForm</a></li>
 				<li><a href="class-FlexiPeeHP.ui.DownloadInvoiceButton.html">DownloadInvoiceButton</a></li>
 				<li><a href="class-FlexiPeeHP.ui.EmbedResponsive.html">EmbedResponsive</a></li>
 				<li><a href="class-FlexiPeeHP.ui.EmbedResponsiveHTML.html">EmbedResponsiveHTML</a></li>
 				<li><a href="class-FlexiPeeHP.ui.EmbedResponsivePDF.html">EmbedResponsivePDF</a></li>
-				<li class="active"><a href="class-FlexiPeeHP.ui.KontaktForm.html">KontaktForm</a></li>
+				<li><a href="class-FlexiPeeHP.ui.KontaktForm.html">KontaktForm</a></li>
 				<li><a href="class-FlexiPeeHP.ui.OrderListingItem.html">OrderListingItem</a></li>
 				<li><a href="class-FlexiPeeHP.ui.OrdersListing.html">OrdersListing</a></li>
 				<li><a href="class-FlexiPeeHP.ui.RecordTypeSelect.html">RecordTypeSelect</a></li>
@@ -131,19 +131,22 @@
 	</div>
 
 <div id="content" class="class">
-	<h1>Class KontaktForm</h1>
+	<h1>Class CompanyLogo</h1>
 
 
+	<div class="description">
+	<p>Description of CompanyLogo</p>
+	</div>
 
 	<dl class="tree">
 		<dd style="padding-left:0px">
-Ease\TWB\Form
+Ease\Html\ImgTag
 			
 			
 		</dd>
 		<dd style="padding-left:30px">
 			<img src="resources/inherit.png" alt="Extended by">
-<b><span>FlexiPeeHP\ui\KontaktForm</span></b>			
+<b><span>FlexiPeeHP\ui\CompanyLogo</span></b>			
 			
 			
 		</dd>
@@ -162,7 +165,9 @@ Ease\TWB\Form
 		<b>Namespace:</b> <a href="namespace-FlexiPeeHP.html">FlexiPeeHP</a>\<a href="namespace-FlexiPeeHP.ui.html">ui</a><br>
 		
 
-			<b>Located at</b> <a href="source-class-FlexiPeeHP.ui.KontaktForm.html#10-55" title="Go to source code">FlexiPeeHP/ui/KontaktForm.php</a>
+				<b>Author:</b>
+				vitex<br>
+			<b>Located at</b> <a href="source-class-FlexiPeeHP.ui.CompanyLogo.html#10-61" title="Go to source code">FlexiPeeHP/ui/CompanyLogo.php</a>
 		<br>
 	</div>
 
@@ -182,20 +187,22 @@ Ease\TWB\Form
 
 		<td class="name"><div>
 		<a class="anchor" href="#___construct">#</a>
-		<code><a href="source-class-FlexiPeeHP.ui.KontaktForm.html#19-54" title="Go to source code">__construct</a>( <span>FlexiPeeHP\Kontakt <var>$contact</var></span> )</code>
+		<code><a href="source-class-FlexiPeeHP.ui.CompanyLogo.html#44-60" title="Go to source code">__construct</a>( <span>array <var>$tagProperties</var> = <span class="php-keyword1">array</span>()</span>, <span>array <var>$options</var> = []</span> )</code>
 
 		<div class="description short">
-			
+			<p>Emebed Company logo into page</p>
 		</div>
 
 		<div class="description detailed hidden">
-			
+			<p>Emebed Company logo into page</p>
 
 
 				<h4>Parameters</h4>
 				<div class="list"><dl>
-					<dt><var>$contact</var></dt>
-					<dd></dd>
+					<dt><var>$tagProperties</var></dt>
+					<dd>$options       FlexiPeeHP object parameters</dd>
+					<dt><var>$options</var></dt>
+					<dd>$tagProperties Additional tag properties</dd>
 				</dl></div>
 
 
@@ -220,28 +227,49 @@ Ease\TWB\Form
 
 	<table class="summary properties" id="properties">
 	<caption>Properties summary</caption>
-	<tr data-order="contact" id="$contact">
+	<tr data-order="none" id="$none">
 		<td class="attributes"><code>
-			public  
-			FlexiPeeHP\Kontakt
+			public static 
+			string
 		</code></td>
 
 		<td class="name">
-				<a href="source-class-FlexiPeeHP.ui.KontaktForm.html#12-17" title="Go to source code"><var>$contact</var></a>
+				<a href="source-class-FlexiPeeHP.ui.CompanyLogo.html#17-42" title="Go to source code"><var>$none</var></a>
 
 			<div class="description short">
-				<p>Contact object.</p>
+				<p>SVG Question Mark</p>
 			</div>
 
 			<div class="description detailed hidden">
-				<p>Contact object.</p>
+				<p>SVG Question Mark</p>
 
 			</div>
 		</td>
 		<td class="value">
 			<div>
-				<a href="#$contact" class="anchor">#</a>
-				<code><span class="php-keyword1">null</span></code>
+				<a href="#$none" class="anchor">#</a>
+				<code><span class="php-quote">'&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;svg version=&quot;1.1&quot; viewBox=&quot;0 0 16 16&quot; xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:cc=&quot;http://creativecommons.org/ns#&quot; xmlns:dc=&quot;http://purl.org/dc/elements/1.1/&quot; xmlns:rdf=&quot;http://www.w3.org/1999/02/22-rdf-syntax-ns#&quot;&gt;
+&lt;metadata&gt;
+&lt;rdf:RDF&gt;
+&lt;cc:Work rdf:about=&quot;&quot;&gt;
+&lt;dc:format&gt;image/svg+xml&lt;/dc:format&gt;
+&lt;dc:type rdf:resource=&quot;http://purl.org/dc/dcmitype/StillImage&quot;/&gt;
+&lt;dc:title/&gt;
+&lt;/cc:Work&gt;
+&lt;/rdf:RDF&gt;
+&lt;/metadata&gt;
+&lt;g transform=&quot;matrix(.05525 0 0 .046036 7.7366 7.9085)&quot;&gt;
+&lt;path d=&quot;m-127.47-157.46v324.27h270.93v-241.3l-82.965-82.965z&quot; fill=&quot;#fff&quot; stroke=&quot;#636363&quot; stroke-width=&quot;6.4&quot;/&gt;
+&lt;g transform=&quot;matrix(1.0667 0 0 1.0667 -388.86 -537.74)&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;
+&lt;rect x=&quot;307.06&quot; y=&quot;451.19&quot; width=&quot;130&quot; height=&quot;150&quot; fill=&quot;#fff&quot; stroke=&quot;#a6a6a6&quot; stroke-width=&quot;6&quot;/&gt;
+&lt;path d=&quot;m343.53 497.65 57.065 57.065&quot; fill=&quot;none&quot; stroke=&quot;#e00000&quot; stroke-width=&quot;12&quot;/&gt;
+&lt;path d=&quot;m400.6 497.65-57.065 57.065&quot; fill=&quot;none&quot; stroke=&quot;#e00000&quot; stroke-width=&quot;12&quot;/&gt;
+&lt;/g&gt;
+&lt;path d=&quot;m143.47-74.496h-82.967v-82.967&quot; fill=&quot;none&quot; stroke=&quot;#636363&quot; stroke-linejoin=&quot;round&quot; stroke-width=&quot;6.4&quot;/&gt;
+&lt;/g&gt;
+&lt;/svg&gt;
+'</span></code>
 			</div>
 		</td>
 	</tr>
