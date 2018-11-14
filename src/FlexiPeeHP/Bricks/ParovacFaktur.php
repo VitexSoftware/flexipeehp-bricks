@@ -48,7 +48,7 @@ class ParovacFaktur extends \Ease\Sand
         foreach ($this->cfgRequed as $key) {
             if ((array_key_exists($key, $this->config) === false) || empty($this->config[$key])) {
                 throw new \Ease\Exception(sprintf(_('Configuration key %s is not set'),
-                        $key));
+                    $key));
             }
         }
         parent::__construct();
@@ -67,6 +67,18 @@ class ParovacFaktur extends \Ease\Sand
                     mktime(0, 0, 0, date("m"), date("d") - $daysBack, date("Y"))));
         }
         $this->daysBack = $daysBack;
+    }
+
+    /**
+     * Prepare invoice helper
+     * @return \FlexiPeeHP\FakturaVydana
+     */
+    public function getInvoicer()
+    {
+        if (!is_object($this->invoicer)) {
+            $this->invoicer = new \FlexiPeeHP\FakturaVydana(null, $this->config);
+        }
+        return $this->invoicer;
     }
 
     /**
@@ -92,10 +104,10 @@ class ParovacFaktur extends \Ease\Sand
             'mena',
             'datVyst'],
             ["sparovano eq false AND typPohybuK eq '".(($direction == 'out') ? 'typPohybu.vydej'
-                    : 'typPohybu.prijem' )."' AND storno eq false ".
-                (is_null($daysBack) ? '' :
-                "AND datVyst eq '".\FlexiPeeHP\FlexiBeeRW::timestampToFlexiDate(mktime(0,
-                        0, 0, date("m"), date("d") - $daysBack, date("Y")))."' ")
+                : 'typPohybu.prijem' )."' AND storno eq false ".
+            (is_null($daysBack) ? '' :
+            "AND datVyst eq '".\FlexiPeeHP\FlexiBeeRW::timestampToFlexiDate(mktime(0,
+                    0, 0, date("m"), date("d") - $daysBack, date("Y")))."' ")
             ], 'id');
 
         if ($this->banker->lastResponseCode == 200) {
@@ -155,16 +167,17 @@ class ParovacFaktur extends \Ease\Sand
      */
     public function getInvoicesToProcess()
     {
+        $this->getInvoicer();
         $this->invoicer->defaultUrlParams['includes'] = '/faktura-vydana/typDokl';
         return $this->searchInvoices(["(stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false"]);
-        }
+    }
 
     /**
      * Párování odchozích faktur podle příchozích plateb v bance
      */
     public function outInvoicesMatchingByBank()
     {
-        $this->invoicer = new \FlexiPeeHP\FakturaVydana(null, $this->config);
+        $this->getInvoicer();
         foreach ($this->getPaymentsToProcess($this->daysBack, 'in') as $paymentData) {
 
             $this->addStatusMessage(sprintf('Processing Payment %s %s %s vs: %s ss: %s %s',
@@ -247,24 +260,24 @@ class ParovacFaktur extends \Ease\Sand
                 if (!empty($paymentData['varSym'])) {
                     if (!empty($paymentData['varSym'])) {
                         $vInvoices = $this->searchInvoices(['varSym' => $paymentData['varSym']]);
+                    }
                 }
-            }
                 if (!empty($paymentData['specSym'])) {
                     if (!empty($paymentData['specSym'])) {
                         $sInvoices = $this->searchInvoices(['specSym' => $paymentData['specSym']]);
-        }
-    }
-
-                if ($vInvoices || $sInvoices) {
-                    $zdd = $this->paymentToZDD($payment);
-                    if ($zdd) {
-                        $this->addStatusMessage(sprinf(_('advance tax document created'),
-                                \FlexiPeeHP\FlexiBeeRO::uncode($zdd)));
                     }
-
-                    $this->addStatusMessage(_('Invoice found: - overdue?'),
-                        'warning');
                 }
+
+//                if ($vInvoices || $sInvoices) {
+////                    $zdd = $this->paymentToZDD($payment);
+////                    if ($zdd) {
+////                        $this->addStatusMessage(sprinf(_('advance tax document created'),
+////                                \FlexiPeeHP\FlexiBeeRO::uncode($zdd)));
+////                    }
+//
+//                    $this->addStatusMessage(_('Invoice found: - overdue?'),
+//                        'warning');
+//                }
             }
         }
     }
@@ -284,7 +297,7 @@ class ParovacFaktur extends \Ease\Sand
     {
         $this->invoicer = new \FlexiPeeHP\FakturaPrijata(null, $this->config);
         foreach ($this->getPaymentsWithinPeriod($range, 'out') as $outPaymentId => $outPaymentData) {
-            $this->banker->setData($outPaymentData,true);
+            $this->banker->setData($outPaymentData, true);
             $this->banker->setMyKey($outPaymentId);
             $this->addStatusMessage(sprintf('Processing Outcoming Payment %s %s %s vs: %s ss: %s %s',
                     $outPaymentData['kod'], $outPaymentData['sumCelkem'],
@@ -322,8 +335,8 @@ class ParovacFaktur extends \Ease\Sand
                             $inInvoice = new \FlexiPeeHP\FakturaVydana($invoiceData,
                                 array_merge($this->config,
                                     ['evidence' => 'faktura-prijata']));
-                            if ($this->settleInvoice($inInvoice,$this->banker)) {
-
+                            if ($this->settleInvoice($inInvoice, $this->banker)) {
+                                
                             }
                         }
                     } else {
@@ -718,39 +731,12 @@ class ParovacFaktur extends \Ease\Sand
     }
 
     /**
-     * Najde vydané faktury
-     *
-     * @param array $paymentData
-     * @return array
+     * 
+     * @param array $vInvoices new invoices
+     * @param array $invoices current invoices
      */
-    public function findInvoices($paymentData)
+    static public function unifyInvoices($vInvoices, &$invoices)
     {
-        $invoices  = [];
-        $vInvoices = [];
-        $sInvoices = [];
-//        $bInvoices = [];
-
-
-        if (!empty($paymentData['varSym'])) {
-            $vInvoices = $this->findInvoice(['varSym' => $paymentData['varSym']]);
-        }
-
-        if (!empty($paymentData['specSym'])) {
-            $sInvoices = $this->findInvoice(['specSym' => $paymentData['specSym']]);
-        }
-
-
-
-        if ($paymentData['buc']) {
-            $bInvoices = $this->findInvoice(['buc' => $paymentData['buc']]);
-            foreach ($bInvoices as $invoiceID => $invoice) {
-                if (!array_key_exists($invoiceID, $invoices)) {
-                    $invoices[$invoiceID] = $invoice;
-                }
-            }
-        }
-
-
         if (!empty($vInvoices) && count($vInvoices)) {
             foreach ($vInvoices as $invoiceID => $invoice) {
                 if (!array_key_exists($invoiceID, $invoices)) {
@@ -758,38 +744,92 @@ class ParovacFaktur extends \Ease\Sand
                 }
             }
         }
-        if (!empty($sInvoices) && count($sInvoices)) {
-            foreach ($sInvoices as $invoiceID => $invoice) {
-                if (!array_key_exists($invoiceID, $invoices)) {
-                    $invoices[$invoiceID] = $invoice;
-                }
+    }
+
+    /**
+     * Najde vydané faktury
+     *
+     * @param array $paymentData
+     * 
+     * @return array
+     */
+    public function findInvoices($paymentData)
+    {
+        $invoices  = [];
+        $vInvoices = [];
+        $sInvoices = [];
+        $uInvoices = [];
+        $bInvoices = [];
+
+        if (!empty($paymentData['varSym'])) {
+            $vInvoices = $this->findInvoice(['varSym' => $paymentData['varSym']]);
+        }
+
+        if (empty($vInvoices)) {
+
+            if (!empty($paymentData['specSym'])) {
+
+                // Faktury vydane "firma":"code:02100",
+                // Adresar: ext:lms.cstmr:2365
+                $uInvoices = $this->findInvoice(['firma' => sprintf("code:%05s",
+                        $paymentData['specSym'])]);
+            }
+
+            if (!empty($paymentData['specSym'])) {
+                $sInvoices = $this->findInvoice(['specSym' => $paymentData['specSym']]);
+            }
+
+            if ($paymentData['buc']) {
+                $bInvoices = $this->findInvoice(['buc' => $paymentData['buc']]);
             }
         }
-//        foreach ($bInvoices as $invoiceID => $invoice) {
-//            if (!array_key_exists($invoiceID, $invoices)) {
-//                $invoices[$invoiceID] = $invoice;
-//            }
-//        }
+
+        self::unifyInvoices($vInvoices, $invoices);
+        self::unifyInvoices($uInvoices, $invoices);
+        self::unifyInvoices($sInvoices, $invoices);
+        self::unifyInvoices($bInvoices, $invoices);
+
+        $invoices = self::reorderInvoicesByAge($invoices);
 
         if (empty($paymentData['varSym']) && empty($paymentData['specSym'])) {
             $this->banker->dataReset();
             $this->banker->setDataValue('id', $paymentData['id']);
-            $this->banker->setDataValue('stitky',
-                $this->config['LABEL_NEIDENTIFIKOVANO']);
-            $this->addStatusMessage(_('Neidentifikovaná platba').': '.self::apiUrlToLink($this->banker->apiURL),
+            $this->banker->setDataValue('stitky', 'NEIDENTIFIKOVANO');
+            $this->addStatusMessage(_('Neidentifikovaná platba').': '.$this->banker->getApiURL(),
                 'warning');
             $this->banker->insertToFlexiBee();
         } elseif (count($invoices) == 0) {
             $this->banker->dataReset();
             $this->banker->setDataValue('id', $paymentData['id']);
-            $this->banker->setDataValue('stitky',
-                $this->config['LABEL_CHYBIFAKTURA']);
-            $this->addStatusMessage(_('Platba bez faktury').': '.self::apiUrlToLink($this->banker->apiURL),
+            $this->banker->setDataValue('stitky', 'CHYBIFAKTURA');
+            $this->addStatusMessage(_('Platba bez faktury').': '.$this->banker->getApiURL(),
                 'warning');
             $this->banker->insertToFlexiBee();
         }
 
         return $invoices;
+    }
+
+    /**
+     * Reorder invoices by Age. 
+     * 
+     * @param array $invoices
+     * 
+     * @return array Older First sorted invoices
+     */
+    public static function reorderInvoicesByAge($invoices)
+    {
+        $invoicesByAge    = [];
+        $invoicesByAgeRaw = [];
+        foreach ($invoices as $invoiceData) {
+            $invoicesByAgeRaw[\FlexiPeeHP\FlexiBeeRW::flexiDateToDateTime($invoiceData['datVyst'])->getTimestamp()]
+                = $invoiceData;
+        }
+        ksort($invoicesByAgeRaw);
+        foreach ($invoicesByAgeRaw as $invoiceData) {
+            $invoicesByAge[$invoiceData['kod']] = $invoiceData;
+        }
+        return $invoicesByAge;
     }
 
     /**

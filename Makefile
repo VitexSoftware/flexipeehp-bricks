@@ -22,7 +22,7 @@ doc:
 
 test:
 	composer update
-	phpunit --bootstrap testing/bootstrap.php
+	phpunit --bootstrap tests/bootstrap.php
 
 changelog:
 	VERSION=`cat debian/composer.json | grep version | awk -F'"' '{print $$4}'`; \
