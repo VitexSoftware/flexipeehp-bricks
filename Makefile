@@ -1,14 +1,3 @@
-all: fresh build install
-
-fresh:
-	git pull
-
-build: 
-	echo build
-
-install: build
-#	cp -rvf src/FlexiPeeHP /usr/share/php/FlexiPeeHP
-	
 clean:
 	rm -rf debian/flexipeehp-bricks
 	rm -rf debian/flexipeehp-bricks-doc
@@ -20,7 +9,7 @@ doc:
 	VERSION=`cat debian/composer.json | grep version | awk -F'"' '{print $$4}'`; \
 	php -f /usr/bin/apigen generate --source src --destination docs --title "FlexiPeeHP-Bricks ${VERSION}" --charset UTF-8 --access-levels public --access-levels protected --php --tree
 
-test:
+phpunit:
 	composer update
 	phpunit --bootstrap tests/bootstrap.php
 
