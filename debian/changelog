@@ -1,9 +1,10 @@
-flexipeehp-bricks (0.12) UNRELEASED; urgency=medium
+flexipeehp-bricks (0.13) UNRELEASED; urgency=medium
 
   * New Order listing widget added
   * CompanyLogo added
+  * getCustomerDebts return only invoices after due date
 
- -- Vítězslav Dvořák <info@vitexsoftware.cz>  Sun, 28 Oct 2018 23:17:39 +0100
+ -- Vítězslav Dvořák <info@vitexsoftware.cz>  Tue, 27 Nov 2018 00:01:22 +0100
 
 flexipeehp-bricks (0.8) experimental; urgency=low
 
