@@ -58,8 +58,6 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | [Customer.php](src/FlexiPeeHP/Bricks/Customer.php)            | Zákazník
 | [HookReciever.php](src/FlexiPeeHP/Bricks/HookReciever.php)    | Příjmač WebHooků
 | [PotvrzeniUhrady.php](src/FlexiPeeHP/Bricks/HookReciever.php) | Třída potvrzující došlou úhradu
-| [Upominac.php](src/FlexiPeeHP/Bricks/HookReciever.php)        | Třída upomínající neplatiče
-| [Upominka.php](src/FlexiPeeHP/Bricks/Upominka.php)            | Třída upomínky pro neplatiče
 | [ParovacFaktur.php](src/FlexiPeeHP/Bricks/ParovacFaktur.php)  | Párovač faktur
 
 # Třídy v FlexiPeeHP/Bricks/ui:

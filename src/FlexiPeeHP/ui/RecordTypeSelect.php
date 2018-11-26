@@ -12,7 +12,7 @@ namespace FlexiPeeHP\ui;
  *
  * @author vitex
  */
-class RecordTypeSelect extends \Ease\Html\Select
+class RecordTypeSelect extends \Ease\Html\SelectTag
 {
 
     /**
@@ -30,11 +30,11 @@ class RecordTypeSelect extends \Ease\Html\Select
         $typesRaw = $engine->getColumnsFromFlexibee(['nazev', $valueType],
             $conditions);
 
-        $types = [''=>_('Undefined')];
+        $types = ['' => _('Undefined')];
         foreach ($typesRaw as $type) {
             $types[$type[$valueType]] = $type['nazev'];
         }
 
-        parent::__construct($engine->getEvidence(), $types,$engine->getMyKey());
+        parent::__construct($engine->getEvidence(), $types, $engine->getMyKey());
     }
 }
