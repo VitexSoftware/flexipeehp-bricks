@@ -7,7 +7,7 @@ namespace FlexiPeeHP\ui;
  *
  * @author Vítězslav Dvořák <info@vitexsoftware.cz>
  */
-class FlexiBeeLogo extends Ease\Html\ImgTag
+class FlexiBeeLogo extends \Ease\Html\ImgTag
 {
     static $svg = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
