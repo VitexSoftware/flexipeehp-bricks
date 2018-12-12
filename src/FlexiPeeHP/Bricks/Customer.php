@@ -194,6 +194,64 @@ class Customer extends \Ease\User
     }
 
     /**
+     * Obtain Customer "Score"
+     *
+     * @param int $addressID FlexiBee user ID
+     * 
+     * @return int ZewlScore
+     */
+    public function getCustomerScore($addressID)
+    {
+        $score     = 0;
+        $debts     = $this->getCustomerDebts($addressID);
+        $stitkyRaw = $this->adresar->getColumnsFromFlexiBee(['stitky'],
+            ['id' => $addressID]);
+        $stitky    = $stitkyRaw[0]['stitky'];
+        if (!empty($debts)) {
+            foreach ($debts as $did => $debt) {
+                $ddiff = \FlexiPeeHP\FakturaVydana::overdueDays($debt['datSplat']);
+
+                if (($ddiff <= 7) && ($ddiff >= 1)) {
+                    $score = self::maxScore($score, 1);
+                } else {
+                    if (($ddiff > 7 ) && ($ddiff <= 14)) {
+                        $score = self::maxScore($score, 2);
+                    } else {
+                        if ($ddiff > 14) {
+                            $score = self::maxScore($score, 3);
+                        }
+                    }
+                }
+            }
+        }
+        if ($score == 3 && !strstr($stitky, 'UPOMINKA2')) {
+            $score = 2;
+        }
+
+        if (!strstr($stitky, 'UPOMINKA1') && !empty($debts)) {
+            $score = 1;
+        }
+
+        return $score;
+    }
+
+    /**
+     * Overdue group
+     *
+     * @param int $score current score value
+     * @param int $level current level
+     *
+     * @return int max of all levels processed
+     */
+    static private function maxScore($score, $level)
+    {
+        if ($level > $score) {
+            $score = $level;
+        }
+        return $score;
+    }
+
+    /**
      * Pokusí se o přihlášení.
      * Try to Sign in.
      *

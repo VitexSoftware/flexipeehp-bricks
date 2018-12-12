@@ -32,9 +32,12 @@ class RecordTypeSelect extends \Ease\Html\SelectTag
 
         $types = ['' => _('Undefined')];
         foreach ($typesRaw as $type) {
-            $types[$type[$valueType]] = $type['nazev'];
+            $types[($valueType == 'kod' ? 'code:' : '').$type[$valueType]] = $type['nazev'];
         }
 
-        parent::__construct($engine->getEvidence(), $types, $engine->getMyKey());
+        parent::__construct($engine->getEvidence(), $types,
+            ($valueType == 'kod' ? \FlexiPeeHP\FlexiBeeRO::code($engine->getDataValue($valueType))
+                    : $engine->getDataValue($valueType))
+        );
     }
 }
