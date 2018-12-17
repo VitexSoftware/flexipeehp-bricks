@@ -12,7 +12,7 @@ namespace FlexiPeeHP\ui;
  *
  * @author vitex
  */
-class EmbedResponsive extends \Ease\Html\Div
+class EmbedResponsive extends \Ease\Html\DivTag
 {
     public function finalize()
     {

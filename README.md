@@ -66,6 +66,7 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | ------------------------------------------------------------- | --------------------------------------|
 | [AdresarForm.php](src/FlexiPeeHP/Bricks/ui/AdresarForm.php)   | Editační formulář adresy
 | [CompanyLogo.php](src/FlexiPeeHP/Bricks/ui/CompanyLogo.php)   | Logo Firmy
+| [FlexiBeeLogo.php](src/FlexiPeeHP/Bricks/ui/FlexiBeeLogo.php) | Logo FlexiBee
 | [KontaktForm.php](src/FlexiPeeHP/Bricks/ui/KontaktForm.php)   | Editační formulář kontaktu adresy
 | [EmbedResponsiveHTML.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsiveHTML.php)| Třída pro zobrazení HTML dokumentu na stránce 
 | [EmbedResponsivePDF.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsivePDF.php)  | Třída pro zobrazení PDF dokumentu na stránce 
