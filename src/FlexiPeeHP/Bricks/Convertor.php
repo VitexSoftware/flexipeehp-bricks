@@ -206,6 +206,7 @@ class Convertor extends \Ease\Sand
     }
 
     /**
+     * Convert document items
      * 
      * @param boolean $keepId   Keep original document ID
      * @param boolean $addExtId Add ExtID pointer to original document  
@@ -222,7 +223,9 @@ class Convertor extends \Ease\Sand
         }
         foreach (self::removeRoColumns($this->rules, $this->output) as $columnToTake => $subitemColumns) {
             if (is_array($subitemColumns)) {
-                $this->convertSubitems($columnToTake, $keepId, $keepCode);
+                if(!empty($this->input->getSubItems())){
+                    $this->convertSubitems($columnToTake, $keepId, $keepCode);
+                }
             } else {
                 $this->output->setDataValue($columnToTake,
                     $this->input->getDataValue($columnToTake));
@@ -242,11 +245,17 @@ class Convertor extends \Ease\Sand
      */
     public static function removeRoColumns(array $rules, $engine)
     {
-
-        foreach ($rules as $column) {
-            $columnInfo = $engine->getColumnInfo($column);
-            if ($columnInfo['isWritable'] == 'false') {
-                unset($rules[$column]);
+        foreach ($rules as $index=>$subrules) {
+            if (is_array($subrules)) {
+                $eback = $engine->getEvidence();
+                $engine->setEvidence($engine->getEvidence().'-polozka');
+                $rules[$index] = self::removeRoColumns($subrules, $engine);
+                $engine->setEvidence($eback);
+            } else {
+                $columnInfo = $engine->getColumnInfo($subrules);
+                if ($columnInfo['isWritable'] == 'false') {
+                    unset($rules[$index]);
+                }
             }
         }
         return $rules;
