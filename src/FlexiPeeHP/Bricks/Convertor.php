@@ -69,20 +69,41 @@ class Convertor extends \Ease\Sand
         $this->output = $destination;
     }
 
-    public function conversion($keepId = false, $addExtId = true,
+    /**
+     * Perform Conversion
+     * 
+     * @param boolean $keepId
+     * @param boolean $addExtId
+     * @param boolean $keepCode
+     * 
+     * @return \FlexiPeeHP\FlexiBeeRW converted object ( unsaved )
+     */
+    public function conversion($keepId = false, $addExtId = false,
                                $keepCode = false)
     {
+        $this->prepareRules();
         $this->convertDocument($keepId, $addExtId, $keepCode);
         return $this->output;
     }
 
+    /**
+     * Get Classname without namespace prefix
+     * 
+     * @param object $object
+     * 
+     * @return string
+     */
     static public function baseClassName($object)
     {
         return basename(str_replace('\\', '/', get_class($object)));
     }
 
-    public function convertDocument($keepId = false, $addExtId = true,
-                                    $keepCode = false)
+    /**
+     * Prepare conversion rules
+     * 
+     * @throws \Ease\Exception
+     */
+    public function prepareRules()
     {
         switch (self::baseClassName($this->input)) {
             case 'FakturaVydana':
@@ -97,14 +118,21 @@ class Convertor extends \Ease\Sand
                         unset($this->rules['datUcto']);
                         unset($this->rules['datUcto']);
 
+                        foreach (array_keys($this->output->getData()) as $colname) {
+                            unset($this->rules[$colname]);
+                        }
 
-                        foreach ($this->rules as $rule){
-                            if(preg_match('/^sum/', $rule)){
+                        if ($this->input->getDataValue('typDokl') != $this->output->getDataValue('typDokl')) {
+                            unset($this->rules['rada']);
+                        }
+
+                        foreach ($this->rules as $rule) {
+                            if (preg_match('/^sum/', $rule)) {
                                 unset($this->rules[$rule]);
                             }
                         }
-                        
-                        
+
+
                         $polozkyDokladu                = new \FlexiPeeHP\FakturaVydanaPolozka();
                         $itemColnames                  = array_keys($polozkyDokladu->getColumnsInfo());
                         $this->rules['polozkyFaktury'] = self::removeRoColumns(array_combine($itemColnames,
@@ -112,19 +140,79 @@ class Convertor extends \Ease\Sand
 
                         break;
                     default :
-                        throw new Exception(sprintf(_('Unsupported Source document type %s'),
+                        throw new \Ease\Exception(sprintf(_('Unsupported Source document type %s'),
                             get_class($this->output)));
                         break;
                 }
                 break;
             default:
-                throw new Exception(sprintf(_('Unsupported Source document type %s'),
+                throw new \Ease\Exception(sprintf(_('Unsupported Source document type %s'),
                     get_class($this->input)));
                 break;
         }
         $this->convertItems($keepId, $addExtId, $keepCode);
     }
 
+    /**
+     * 
+     * @param boolean $keepId   keep item IDs
+     * @param boolean $addExtId add ext:originalEvidence:originalId 
+     * @param boolean $keepCode keep items code
+     */
+    public function convertDocument($keepId = false, $addExtId = false,
+                                    $keepCode = false)
+    {
+        $this->convertItems($keepId, $addExtId, $keepCode);
+    }
+
+    /**
+     * 
+     * @param string  $columnToTake usually "polozkyDokladu"
+     * @param boolean $keepId       keep item IDs
+     * @param boolean $keepCode     keep items code
+     */
+    public function convertSubitems($columnToTake, $keepId = false,
+                                    $keepCode = false)
+    {
+        $subitemRules = $this->rules[$columnToTake];
+        if (self::isAssoc($this->input->data[$columnToTake])) {
+            $sourceData = [$this->input->data[$columnToTake]];
+        } else {
+            $sourceData = $this->input->data[$columnToTake];
+        }
+
+        $typUcOp = $this->input->getDataValue('typUcOp');
+
+        foreach ($sourceData as $subItemData) {
+            foreach (array_keys($subItemData) as $subitemColumn) {
+                if (!array_key_exists($subitemColumn, $subitemRules)) {
+                    unset($subItemData[$subitemColumn]);
+                }
+            }
+            if ($typUcOp) {
+                $subItemData['typUcOp'] = $typUcOp;
+            } else {
+                unset($subItemData['typUcOp']);
+            }
+
+            if ($keepCode === false) {
+                unset($subItemData['kod']);
+            }
+            if ($keepId === false) {
+                unset($subItemData['id']);
+                unset($subItemData['external-ids']);
+            }
+            $this->output->addArrayToBranch($subItemData);
+        }
+    }
+
+    /**
+     * Convert document items
+     * 
+     * @param boolean $keepId   Keep original document ID
+     * @param boolean $addExtId Add ExtID pointer to original document  
+     * @param boolean $keepCode Keep original document Code
+     */
     public function convertItems($keepId = false, $addExtId = true,
                                  $keepCode = false)
     {
@@ -135,34 +223,11 @@ class Convertor extends \Ease\Sand
             unset($this->rules['id']);
         }
         foreach (self::removeRoColumns($this->rules, $this->output) as $columnToTake => $subitemColumns) {
-        
             if (is_array($subitemColumns)) {
-
-                if (self::isAssoc($this->input->data[$columnToTake])) {
-                    $sourceData = [$this->input->data[$columnToTake]];
-                } else {
-                    $sourceData = $this->input->data[$columnToTake];
-    }
-
-                foreach ($sourceData as $subitemData) {
-                    foreach ($subitemColumns as $subitemColumn) {
-                        if (!array_key_exists($subitemColumn, $subitemColumns)) {
-                            unset($subitemData[$subitemColumn]);
-                        }
-                    }
-
-                    if ($keepCode === false) {
-                        unset($subitemData['kod']);
-                    }
-                    if ($keepId === false) {
-                        unset($subitemData['id']);
-                    }
-
-
-                    $this->output->addArrayToBranch($subitemData);
+                if(!empty($this->input->getSubItems())){
+                    $this->convertSubitems($columnToTake, $keepId, $keepCode);
                 }
             } else {
-
                 $this->output->setDataValue($columnToTake,
                     $this->input->getDataValue($columnToTake));
             }
@@ -181,11 +246,17 @@ class Convertor extends \Ease\Sand
      */
     public static function removeRoColumns(array $rules, $engine)
     {
-
-        foreach ($rules as $column) {
-            $columnInfo = $engine->getColumnInfo($column);
-            if ($columnInfo['isWritable'] == 'false') {
-                unset($rules[$column]);
+        foreach ($rules as $index=>$subrules) {
+            if (is_array($subrules)) {
+                $eback = $engine->getEvidence();
+                $engine->setEvidence($engine->getEvidence().'-polozka');
+                $rules[$index] = self::removeRoColumns($subrules, $engine);
+                $engine->setEvidence($eback);
+            } else {
+                $columnInfo = $engine->getColumnInfo($subrules);
+                if ($columnInfo['isWritable'] == 'false') {
+                    unset($rules[$index]);
+                }
             }
         }
         return $rules;

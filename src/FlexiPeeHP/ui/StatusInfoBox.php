@@ -24,10 +24,9 @@ class StatusInfoBox extends \FlexiPeeHP\Company
      * @param string|array $init    company dbNazev or initial data
      * @param array        $options Connection settings override
      */
-    
     public function __construct($init = null, $properites = [])
     {
-        parent::__construct($init, $properites);
+        parent::__consrequires DIR_FS_CLASSES removed globalytruct($init, $properites);
         $infoRaw = $this->getFlexiData();
         if (count($infoRaw) && !array_key_exists('success', $infoRaw)) {
             $this->info = $this->reindexArrayBy($infoRaw, 'dbNazev');
@@ -35,12 +34,22 @@ class StatusInfoBox extends \FlexiPeeHP\Company
     }
 
     /**
+     * Is Configured company connected ?
+     * 
+     * @return boolean
+     */
+    public function connected()
+    {
+        return array_key_exists($this->getCompany(), $this->info);
+    }
+
+    /**
      * Draw result
      */
     public function draw()
     {
+        if ($this->connected()) {
         $myCompany = $this->getCompany();
-        if (array_key_exists($myCompany, $this->info)) {
             $return = new \Ease\TWB\LinkButton($this->url.'/c/'.$myCompany,
                 $this->info[$myCompany]['nazev'], 'success');
         } else {
