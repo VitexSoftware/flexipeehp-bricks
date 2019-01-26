@@ -150,6 +150,17 @@ class Convertor extends \Ease\Sand
                     get_class($this->input)));
                 break;
         }
+    }
+
+    /**
+     * 
+     * @param boolean $keepId   keep item IDs
+     * @param boolean $addExtId add ext:originalEvidence:originalId 
+     * @param boolean $keepCode keep items code
+     */
+    public function convertDocument($keepId = false, $addExtId = false,
+                                    $keepCode = false)
+    {
         $this->convertItems($keepId, $addExtId, $keepCode);
     }
 
