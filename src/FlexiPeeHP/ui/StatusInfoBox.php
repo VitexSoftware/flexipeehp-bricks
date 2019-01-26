@@ -26,7 +26,7 @@ class StatusInfoBox extends \FlexiPeeHP\Company
      */
     public function __construct($init = null, $properites = [])
     {
-        parent::__consrequires DIR_FS_CLASSES removed globalytruct($init, $properites);
+        parent::__construct($init, $properites);
         $infoRaw = $this->getFlexiData();
         if (count($infoRaw) && !array_key_exists('success', $infoRaw)) {
             $this->info = $this->reindexArrayBy($infoRaw, 'dbNazev');
