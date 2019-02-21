@@ -52,6 +52,7 @@ class Convertor extends \Ease\Sand
     }
 
     /**
+     * Set Source Documnet
      * 
      * @param \FlexiPeeHP\FlexiBeeRO $source
      */
@@ -61,6 +62,7 @@ class Convertor extends \Ease\Sand
     }
 
     /**
+     * Set Destination document
      * 
      * @param \FlexiPeeHP\FlexiBeeRO $destinantion
      */
@@ -141,18 +143,19 @@ class Convertor extends \Ease\Sand
                         break;
                     default :
                         throw new \Ease\Exception(sprintf(_('Unsupported Source document type %s'),
-                            get_class($this->output)));
+                                get_class($this->output)));
                         break;
                 }
                 break;
             default:
                 throw new \Ease\Exception(sprintf(_('Unsupported Source document type %s'),
-                    get_class($this->input)));
+                        get_class($this->input)));
                 break;
         }
     }
 
     /**
+     * Convert FlexiBee document
      * 
      * @param boolean $keepId   keep item IDs
      * @param boolean $addExtId add ext:originalEvidence:originalId 
@@ -165,18 +168,7 @@ class Convertor extends \Ease\Sand
     }
 
     /**
-     * 
-     * @param boolean $keepId   keep item IDs
-     * @param boolean $addExtId add ext:originalEvidence:originalId 
-     * @param boolean $keepCode keep items code
-     */
-    public function convertDocument($keepId = false, $addExtId = false,
-                                    $keepCode = false)
-    {
-        $this->convertItems($keepId, $addExtId, $keepCode);
-    }
-
-    /**
+     * Convert FlexiBee documnet's subitems
      * 
      * @param string  $columnToTake usually "polozkyDokladu"
      * @param boolean $keepId       keep item IDs
@@ -235,7 +227,7 @@ class Convertor extends \Ease\Sand
         }
         foreach (self::removeRoColumns($this->rules, $this->output) as $columnToTake => $subitemColumns) {
             if (is_array($subitemColumns)) {
-                if(!empty($this->input->getSubItems())){
+                if (!empty($this->input->getSubItems())) {
                     $this->convertSubitems($columnToTake, $keepId, $keepCode);
                 }
             } else {
@@ -257,9 +249,9 @@ class Convertor extends \Ease\Sand
      */
     public static function removeRoColumns(array $rules, $engine)
     {
-        foreach ($rules as $index=>$subrules) {
+        foreach ($rules as $index => $subrules) {
             if (is_array($subrules)) {
-                $eback = $engine->getEvidence();
+                $eback         = $engine->getEvidence();
                 $engine->setEvidence($engine->getEvidence().'-polozka');
                 $rules[$index] = self::removeRoColumns($subrules, $engine);
                 $engine->setEvidence($eback);
@@ -274,6 +266,7 @@ class Convertor extends \Ease\Sand
     }
 
     /**
+     * Return itemes that same on both sides
      * 
      * @return array
      */
@@ -281,5 +274,25 @@ class Convertor extends \Ease\Sand
     {
         return array_intersect(array_keys($this->input->getColumnsInfo()),
             array_keys($this->output->getColumnsInfo()));
+    }
+
+    /**
+     * Get input object here
+     * 
+     * @return \FlexiPeeHP\FlexiBeeRO
+     */
+    public function getInput()
+    {
+        return $this->input;
+    }
+
+    /**
+     * Get output object here
+     * 
+     * @return \FlexiPeeHP\FlexiBeeRO
+     */
+    public function getOutput()
+    {
+        return $this->output;
     }
 }
