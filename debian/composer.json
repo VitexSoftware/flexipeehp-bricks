@@ -1,5 +1,5 @@
 {
-    "name": "flexipeehp-bricks",
+    "name": "vitexsoftware.flexipeehp-bricks",
     "description": "PHP Based Library for easy interaction with czech accounting system Flexibee.",
     "homepage": "https://github.com/VitexSoftware/FlexiPeeHP-Bricks",
     "license": "GPL-2.0+",
@@ -12,7 +12,7 @@
         }
     ],
     "require": {
-        "flexipeehp": "*"
+        "spojenet.flexipeehp": "*"
     },
     "autoload": {
         "psr-4": {
