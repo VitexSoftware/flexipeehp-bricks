@@ -1,3 +1,12 @@
+flexipeehp-bricks (0.18) UNRELEASED; urgency=medium
+
+  * New GateKeeper
+  * New RecordSelector
+  * Button Installer example
+
+ -- Vítězslav Dvořák <vitex@develoid.jinonice.czf>  Mon, 15 Apr 2019 20:57:25 +0200
+
+
 flexipeehp-bricks (0.13) UNRELEASED; urgency=medium
 
   * New Order listing widget added

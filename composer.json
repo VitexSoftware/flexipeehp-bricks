@@ -9,7 +9,8 @@
         }
     ],
     "require": {
-        "spoje.net/flexipeehp": ">=1.10"
+        "spoje.net/flexipeehp": "dev-master",
+        "vitexsoftware/ease-bricks": "dev-master"
     },
     "autoload": {
         "psr-4": {

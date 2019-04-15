@@ -192,6 +192,11 @@ class Convertor extends \Ease\Sand
                     unset($subItemData[$subitemColumn]);
                 }
             }
+            
+            if(array_key_exists('ucetni', $subItemData) && array_key_exists('ucetni', $this->input->getData()) ){
+                $subItemData['ucetni'] = $this->input->getDataValue('ucetni');
+            }
+            
             if ($typUcOp) {
                 $subItemData['typUcOp'] = $typUcOp;
             } else {
