@@ -39,6 +39,6 @@ class EmbedResponsivePDF extends EmbedResponsive
         $url = \Ease\Shared::addUrlParams($feeder, $addParams);
         
         parent::__construct('<object data=\''.$url.'\' type=\'application/pdf\' height=\'600\' width=\'100%\'></object>',
-            ['class' => 'embed-responsive', 'style' => 'width:600px;height:100%;']);
+            ['class' => 'embed-responsive', 'style' => 'min-height:100vh;width:100%']);
     }
 }
