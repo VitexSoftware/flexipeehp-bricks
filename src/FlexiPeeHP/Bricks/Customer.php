@@ -184,8 +184,8 @@ class Customer extends \Ease\User
             'mena',
             'zamekK',
             'datVyst'],
-            ["datSplat lte '".\FlexiPeeHP\FlexiBeeRW::dateToFlexiDate(new \DateTime())."' AND (stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false AND firma=".$firma],
-            'kod');
+            ["datSplat lte '".\FlexiPeeHP\FlexiBeeRW::dateToFlexiDate(new \DateTime())."' AND (stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false AND firma=".(is_numeric($firma)
+                    ? $firma : "'".$firma."'" )], 'kod');
 
         if ($this->invoicer->lastResponseCode == 200) {
             $result = $invoices;

@@ -52,6 +52,7 @@ class Convertor extends \Ease\Sand
     }
 
     /**
+     * Set Source Documnet
      * 
      * @param \FlexiPeeHP\FlexiBeeRO $source
      */
@@ -61,6 +62,7 @@ class Convertor extends \Ease\Sand
     }
 
     /**
+     * Set Destination document
      * 
      * @param \FlexiPeeHP\FlexiBeeRO $destinantion
      */
@@ -75,14 +77,15 @@ class Convertor extends \Ease\Sand
      * @param boolean $keepId
      * @param boolean $addExtId
      * @param boolean $keepCode
+     * @param boolean $handleAccounting set columns "ucetni" like target or ignore it
      * 
      * @return \FlexiPeeHP\FlexiBeeRW converted object ( unsaved )
      */
     public function conversion($keepId = false, $addExtId = false,
-                               $keepCode = false)
+                               $keepCode = false, $handleAccounting = false)
     {
         $this->prepareRules();
-        $this->convertDocument($keepId, $addExtId, $keepCode);
+        $this->convertDocument($keepId, $addExtId, $keepCode, $handleAccounting);
         return $this->output;
     }
 
@@ -141,55 +144,50 @@ class Convertor extends \Ease\Sand
                         break;
                     default :
                         throw new \Ease\Exception(sprintf(_('Unsupported Source document type %s'),
-                            get_class($this->output)));
+                                get_class($this->output)));
                         break;
                 }
                 break;
             default:
                 throw new \Ease\Exception(sprintf(_('Unsupported Source document type %s'),
-                    get_class($this->input)));
+                        get_class($this->input)));
                 break;
         }
     }
 
     /**
+     * Convert FlexiBee document
      * 
-     * @param boolean $keepId   keep item IDs
-     * @param boolean $addExtId add ext:originalEvidence:originalId 
-     * @param boolean $keepCode keep items code
+     * @param boolean $keepId           keep item IDs
+     * @param boolean $addExtId         add ext:originalEvidence:originalId 
+     * @param boolean $keepCode         keep items code
+     * @param boolean $handleAccounting set item's "ucetni" like target 
      */
     public function convertDocument($keepId = false, $addExtId = false,
-                                    $keepCode = false)
+                                    $keepCode = false, $handleAccountig = false)
     {
-        $this->convertItems($keepId, $addExtId, $keepCode);
+        if ($handleAccountig === false) {
+            unset($this->rules['ucetni']);
+        }
+        $this->convertItems($keepId, $addExtId, $keepCode, $handleAccountig);
     }
 
     /**
+     * Convert FlexiBee documnet's subitems
      * 
-     * @param boolean $keepId   keep item IDs
-     * @param boolean $addExtId add ext:originalEvidence:originalId 
-     * @param boolean $keepCode keep items code
-     */
-    public function convertDocument($keepId = false, $addExtId = false,
-                                    $keepCode = false)
-    {
-        $this->convertItems($keepId, $addExtId, $keepCode);
-    }
-
-    /**
-     * 
-     * @param string  $columnToTake usually "polozkyDokladu"
-     * @param boolean $keepId       keep item IDs
-     * @param boolean $keepCode     keep items code
+     * @param string  $columnToTake   usually "polozkyDokladu"
+     * @param boolean $keepId         keep item IDs
+     * @param boolean $keepCode       keep items code
+     * @param boolean $keepAccounting set item's "ucetni" like target 
      */
     public function convertSubitems($columnToTake, $keepId = false,
-                                    $keepCode = false)
+                                    $keepCode = false, $keepAccountig = false)
     {
         $subitemRules = $this->rules[$columnToTake];
         if (self::isAssoc($this->input->data[$columnToTake])) {
             $sourceData = [$this->input->data[$columnToTake]];
         } else {
-            $sourceData = $this->input->data[$columnToTake];
+            $sourceData = $this->input->getDataValue($columnToTake);
         }
 
         $typUcOp = $this->input->getDataValue('typUcOp');
@@ -200,6 +198,14 @@ class Convertor extends \Ease\Sand
                     unset($subItemData[$subitemColumn]);
                 }
             }
+
+            if ($keepAccountig && array_key_exists('ucetni', $subItemData) && array_key_exists('ucetni',
+                    $this->output->getData())) {
+                $subItemData['ucetni'] = $this->output->getDataValue('ucetni');
+            } else {
+                unset($subItemData['ucetni']);
+            }
+
             if ($typUcOp) {
                 $subItemData['typUcOp'] = $typUcOp;
             } else {
@@ -220,12 +226,13 @@ class Convertor extends \Ease\Sand
     /**
      * Convert document items
      * 
-     * @param boolean $keepId   Keep original document ID
-     * @param boolean $addExtId Add ExtID pointer to original document  
-     * @param boolean $keepCode Keep original document Code
+     * @param boolean $keepId           Keep original document ID
+     * @param boolean $addExtId         Add ExtID pointer to original document  
+     * @param boolean $keepCode         Keep original document Code
+     * @param boolean $handleAccounting set item's "ucetni" like target 
      */
     public function convertItems($keepId = false, $addExtId = true,
-                                 $keepCode = false)
+                                 $keepCode = false, $handleAccounting = false)
     {
         if ($keepCode === false) {
             unset($this->rules['kod']);
@@ -235,8 +242,8 @@ class Convertor extends \Ease\Sand
         }
         foreach (self::removeRoColumns($this->rules, $this->output) as $columnToTake => $subitemColumns) {
             if (is_array($subitemColumns)) {
-                if(!empty($this->input->getSubItems())){
-                    $this->convertSubitems($columnToTake, $keepId, $keepCode);
+                if (!empty($this->input->getSubItems())) {
+                    $this->convertSubitems($columnToTake, $keepId, $keepCode,$handleAccounting);
                 }
             } else {
                 $this->output->setDataValue($columnToTake,
@@ -257,9 +264,9 @@ class Convertor extends \Ease\Sand
      */
     public static function removeRoColumns(array $rules, $engine)
     {
-        foreach ($rules as $index=>$subrules) {
+        foreach ($rules as $index => $subrules) {
             if (is_array($subrules)) {
-                $eback = $engine->getEvidence();
+                $eback         = $engine->getEvidence();
                 $engine->setEvidence($engine->getEvidence().'-polozka');
                 $rules[$index] = self::removeRoColumns($subrules, $engine);
                 $engine->setEvidence($eback);
@@ -274,6 +281,7 @@ class Convertor extends \Ease\Sand
     }
 
     /**
+     * Return itemes that same on both sides
      * 
      * @return array
      */
@@ -281,5 +289,25 @@ class Convertor extends \Ease\Sand
     {
         return array_intersect(array_keys($this->input->getColumnsInfo()),
             array_keys($this->output->getColumnsInfo()));
+    }
+
+    /**
+     * Get input object here
+     * 
+     * @return \FlexiPeeHP\FlexiBeeRO
+     */
+    public function getInput()
+    {
+        return $this->input;
+    }
+
+    /**
+     * Get output object here
+     * 
+     * @return \FlexiPeeHP\FlexiBeeRO
+     */
+    public function getOutput()
+    {
+        return $this->output;
     }
 }

@@ -57,6 +57,7 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | [Convertor.php](src/FlexiPeeHP/Bricks/Convertor.php)          | Konvertor dokladů
 | [Customer.php](src/FlexiPeeHP/Bricks/Customer.php)            | Zákazník
 | [GdprLog.php](src/FlexiPeeHP/Bricks/GdprLog.php)              | GDPR Logger s podporou pro FlexiBee
+| [GateKeeper.php](src/FlexiPeeHP/Bricks/GateKeeper.php)        | Kontroluje zdali je shodná firma uživatele a dokladu
 | [HookReciever.php](src/FlexiPeeHP/Bricks/HookReciever.php)    | Příjmač WebHooků
 | [PotvrzeniUhrady.php](src/FlexiPeeHP/Bricks/HookReciever.php) | Třída potvrzující došlou úhradu
 | [ParovacFaktur.php](src/FlexiPeeHP/Bricks/ParovacFaktur.php)  | Párovač faktur
@@ -72,6 +73,7 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | [EmbedResponsiveHTML.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsiveHTML.php)| Třída pro zobrazení HTML dokumentu na stránce 
 | [EmbedResponsivePDF.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsivePDF.php)  | Třída pro zobrazení PDF dokumentu na stránce 
 | [RecordTypeSelect.php](src/FlexiPeeHP/Bricks/ui/RecordTypeSelect.php)      | Nabídka pro výběr typu dokumnetu 
+| [RecordChooser.php](src/FlexiPeeHP/Bricks/ui/RecordChooser.php)            | Nabídka pro výběr záznamu zaleožený na [Selectize.js](https://selectize.github.io/selectize.js/)
 | [StatusInfoBox.php](src/FlexiPeeHP/Bricks/ui/StatusInfoBox.php)            | Info widget o stavu připojení
 
 
@@ -100,6 +102,10 @@ Formulář pro zadání přihlašovacích údajů FlexiBee a zobrazení zdali by
 
 ![Test Připojení](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/statussignin.png)
 
+
+Instalátor uživatelských tlačítek [buttonInstaller](src/buttonInstaller.php)
+
+![Custom Button Installer](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/buttoninstaller.png)
 
 Debian/Ubuntu
 -------------
