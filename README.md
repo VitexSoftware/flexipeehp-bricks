@@ -56,6 +56,7 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | ------------------------------------------------------------- | --------------------------------------|
 | [Convertor.php](src/FlexiPeeHP/Bricks/Convertor.php)          | Konvertor dokladů
 | [Customer.php](src/FlexiPeeHP/Bricks/Customer.php)            | Zákazník
+| [GdprLog.php](src/FlexiPeeHP/Bricks/GdprLog.php)              | GDPR Logger s podporou pro FlexiBee
 | [HookReciever.php](src/FlexiPeeHP/Bricks/HookReciever.php)    | Příjmač WebHooků
 | [PotvrzeniUhrady.php](src/FlexiPeeHP/Bricks/HookReciever.php) | Třída potvrzující došlou úhradu
 | [ParovacFaktur.php](src/FlexiPeeHP/Bricks/ParovacFaktur.php)  | Párovač faktur
