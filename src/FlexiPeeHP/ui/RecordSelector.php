@@ -9,17 +9,16 @@
 namespace FlexiPeeHP\ui;
 
 /**
- * Description of GroupChooser
+ * Select One Value 
  *
  * @author Vítězslav Dvořák <info@vitexsoftware.cz>
  */
-class RecordChooser extends \Ease\Html\InputTextTag
+class RecordSelector extends \Ease\Html\SelectTag
 {
     use \Ease\ui\Selectizer;
-    
-    
+
     /**
-     * Selectize.js based Record Chooser
+     * Selectize.js based input
      * 
      * @param string                 $name
      * @param array                  $values
@@ -48,6 +47,7 @@ class RecordChooser extends \Ease\Html\InputTextTag
                 $values[$id][$nameColumn] = $values[$id][$keyColumn].': '.$values[$id][$nameColumn];
             }
         }
-        $this->selectize(['plugins'=>['remove_button'], 'valueField' => $keyColumn, 'labelField' => $nameColumn, 'searchField' => ['kod', 'nazev'], 'create' => false  ], $values);
+        
+        $this->selectize( ['valueField' => $keyColumn, 'labelField' => $nameColumn, 'searchField' => ['kod', 'nazev'], 'create' => false  ],$values );
     }
 }
