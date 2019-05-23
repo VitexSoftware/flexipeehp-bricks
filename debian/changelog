@@ -1,11 +1,18 @@
-flexipeehp-bricks (0.18) UNRELEASED; urgency=medium
+flexipeehp-bricks (0.21) UNRELEASED; urgency=medium
+
+  * new gatekeeper
+  * GDPR Logger Class added 
+  * \Ease\ui\Selectizer based RecordChooser && RecordSelector 
+
+ -- Vítězslav Dvořák <vitex@develoid.jinonice.czf>  Thu, 23 May 2019 23:33:40 +0200
+
+flexipeehp-bricks (0.19) UNRELEASED; urgency=medium
 
   * New GateKeeper
   * New RecordSelector
   * Button Installer example
 
- -- Vítězslav Dvořák <vitex@develoid.jinonice.czf>  Mon, 15 Apr 2019 20:57:25 +0200
-
+ -- Vítězslav Dvořák <vitex@develoid.jinonice.czf>  Thu, 23 May 2019 23:30:11 +0200
 
 flexipeehp-bricks (0.13) UNRELEASED; urgency=medium
 

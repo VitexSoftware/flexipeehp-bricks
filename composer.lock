@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "2201aaa6558816c16444b5cd1fbf2bb8",
+    "content-hash": "7c0cba234b32baac8c693a86cfc2da67",
     "packages": [
         {
             "name": "pear/console_getopt",
@@ -258,29 +258,25 @@
         },
         {
             "name": "spoje.net/flexipeehp",
-            "version": "1.20",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Spoje-NET/FlexiPeeHP.git",
-                "reference": "571f684ca23326589d3ddd7c3ce5e4a40cda6456"
+                "reference": "3635a3ed738bbf86342747c78dea47032cdd3a93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Spoje-NET/FlexiPeeHP/zipball/571f684ca23326589d3ddd7c3ce5e4a40cda6456",
-                "reference": "571f684ca23326589d3ddd7c3ce5e4a40cda6456",
+                "url": "https://api.github.com/repos/Spoje-NET/FlexiPeeHP/zipball/3635a3ed738bbf86342747c78dea47032cdd3a93",
+                "reference": "3635a3ed738bbf86342747c78dea47032cdd3a93",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
-                "php": ">=5.6 <7.4",
-                "vitexsoftware/ease-framework": ">=1.5"
+                "vitexsoftware/ease-framework": ">=1.29"
             },
             "require-dev": {
-                "jakub-onderka/php-console-highlighter": "^0.3.2",
-                "jakub-onderka/php-parallel-lint": "^0.9.2",
-                "phpunit/php-token-stream": "~1.2",
-                "phpunit/phpunit": "5.3.*",
-                "phpunit/phpunit-skeleton-generator": "*"
+                "phing/phing": "*",
+                "phpunit/phpunit": "*"
             },
             "type": "library",
             "autoload": {
@@ -290,7 +286,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
-                "GPL-2.0"
+                "GPL-2.0-or-later"
             ],
             "authors": [
                 {
@@ -299,7 +295,7 @@
                 }
             ],
             "description": "PHP Based Library for easy interaction with czech accounting system Flexibee.",
-            "time": "2018-10-25T11:24:10+00:00"
+            "time": "2019-05-23T15:29:55+00:00"
         },
         {
             "name": "vitexsoftware/ease-bricks",
@@ -307,12 +303,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/VitexSoftware/Ease-PHP-Bricks.git",
-                "reference": "e1616d1b1baebf99cdb7f3ce6d71369d709278a7"
+                "reference": "9966436ce56ba586103d645e3fe1aeda22f4c608"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VitexSoftware/Ease-PHP-Bricks/zipball/e1616d1b1baebf99cdb7f3ce6d71369d709278a7",
-                "reference": "e1616d1b1baebf99cdb7f3ce6d71369d709278a7",
+                "url": "https://api.github.com/repos/VitexSoftware/Ease-PHP-Bricks/zipball/9966436ce56ba586103d645e3fe1aeda22f4c608",
+                "reference": "9966436ce56ba586103d645e3fe1aeda22f4c608",
                 "shasum": ""
             },
             "require": {
@@ -349,26 +345,26 @@
             ],
             "description": "EasePHPframework addons and code snipplets",
             "homepage": "http://v.s.cz/ease.php",
-            "time": "2019-03-12T22:12:13+00:00"
+            "time": "2019-05-22T17:26:42+00:00"
         },
         {
             "name": "vitexsoftware/ease-framework",
-            "version": "1.19",
+            "version": "1.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/VitexSoftware/EaseFramework.git",
-                "reference": "176498391beba358e67403748d818cd8058e18ad"
+                "reference": "a6eef114e09448e2960cd1f661e462adb30f5d25"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/VitexSoftware/EaseFramework/zipball/176498391beba358e67403748d818cd8058e18ad",
-                "reference": "176498391beba358e67403748d818cd8058e18ad",
+                "url": "https://api.github.com/repos/VitexSoftware/EaseFramework/zipball/a6eef114e09448e2960cd1f661e462adb30f5d25",
+                "reference": "a6eef114e09448e2960cd1f661e462adb30f5d25",
                 "shasum": ""
             },
             "require": {
                 "ext-pdo": "*",
-                "pear/mail": "~1.3",
-                "pear/mail_mime": "~1.10",
+                "pear/mail": "*",
+                "pear/mail_mime": "*",
                 "php": ">=5.6"
             },
             "require-dev": {
@@ -378,7 +374,7 @@
                 "mockery/mockery": "^1.1",
                 "php-coveralls/php-coveralls": "^2",
                 "phpunit/php-token-stream": ">=1.4",
-                "phpunit/phpunit": ">=5.7",
+                "phpunit/phpunit": "^6",
                 "phpunit/phpunit-skeleton-generator": "*",
                 "robmorgan/phinx": "^0.9",
                 "squizlabs/php_codesniffer": "^3.2"
@@ -391,8 +387,7 @@
                     "Ease\\Html\\": "src/Ease/Html",
                     "Ease\\JQuery\\": "src/Ease/JQuery",
                     "Ease\\SQL\\": "src/Ease/SQL",
-                    "Ease\\TWB\\": "src/Ease/TWB",
-                    "Ease\\TWB4\\": "src/Ease/TWB4"
+                    "Ease\\TWB\\": "src/Ease/TWB"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -408,7 +403,7 @@
             ],
             "description": "An PHP Framework for Ease of writing Applications",
             "homepage": "http://v.s.cz/ease.php",
-            "time": "2018-11-22T11:52:38+00:00"
+            "time": "2019-05-16T10:25:15+00:00"
         }
     ],
     "packages-dev": [
@@ -623,45 +618,34 @@
         },
         {
             "name": "facebook/webdriver",
-            "version": "1.6.0",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/facebook/php-webdriver.git",
-                "reference": "bd8c740097eb9f2fc3735250fc1912bc811a954e"
+                "reference": "77300c4ab2025d4316635f592ec849ca7323bd8c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/bd8c740097eb9f2fc3735250fc1912bc811a954e",
-                "reference": "bd8c740097eb9f2fc3735250fc1912bc811a954e",
+                "url": "https://api.github.com/repos/facebook/php-webdriver/zipball/77300c4ab2025d4316635f592ec849ca7323bd8c",
+                "reference": "77300c4ab2025d4316635f592ec849ca7323bd8c",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
-                "ext-json": "*",
-                "ext-mbstring": "*",
-                "ext-zip": "*",
-                "php": "^5.6 || ~7.0",
-                "symfony/process": "^2.8 || ^3.1 || ^4.0"
+                "php": "^5.5 || ~7.0",
+                "symfony/process": "^2.8 || ^3.1"
             },
             "require-dev": {
-                "friendsofphp/php-cs-fixer": "^2.0",
-                "jakub-onderka/php-parallel-lint": "^0.9.2",
-                "php-coveralls/php-coveralls": "^2.0",
+                "friendsofphp/php-cs-fixer": "^1.11",
                 "php-mock/php-mock-phpunit": "^1.1",
-                "phpunit/phpunit": "^5.7",
-                "sebastian/environment": "^1.3.4 || ^2.0 || ^3.0",
-                "squizlabs/php_codesniffer": "^2.6",
-                "symfony/var-dumper": "^3.3 || ^4.0"
+                "phpunit/phpunit": "4.6.* || ~5.0",
+                "satooshi/php-coveralls": "^1.0",
+                "squizlabs/php_codesniffer": "^2.6"
             },
             "suggest": {
-                "ext-SimpleXML": "For Firefox profile creation"
+                "phpdocumentor/phpdocumentor": "2.*"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-community": "1.5-dev"
-                }
-            },
             "autoload": {
                 "psr-4": {
                     "Facebook\\WebDriver\\": "lib/"
@@ -671,7 +655,7 @@
             "license": [
                 "Apache-2.0"
             ],
-            "description": "A PHP client for Selenium WebDriver",
+            "description": "A PHP client for WebDriver",
             "homepage": "https://github.com/facebook/php-webdriver",
             "keywords": [
                 "facebook",
@@ -679,7 +663,7 @@
                 "selenium",
                 "webdriver"
             ],
-            "time": "2018-05-16T17:37:13+00:00"
+            "time": "2017-01-13T15:48:08+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
@@ -968,16 +952,16 @@
         },
         {
             "name": "phpdocumentor/reflection-docblock",
-            "version": "4.3.0",
+            "version": "4.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "94fd0001232e47129dd3504189fa1c7225010d08"
+                "reference": "bdd9f737ebc2a01c06ea7ff4308ec6697db9b53c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/94fd0001232e47129dd3504189fa1c7225010d08",
-                "reference": "94fd0001232e47129dd3504189fa1c7225010d08",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/bdd9f737ebc2a01c06ea7ff4308ec6697db9b53c",
+                "reference": "bdd9f737ebc2a01c06ea7ff4308ec6697db9b53c",
                 "shasum": ""
             },
             "require": {
@@ -1015,7 +999,7 @@
                 }
             ],
             "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
-            "time": "2017-11-30T07:14:17+00:00"
+            "time": "2019-04-30T17:48:53+00:00"
         },
         {
             "name": "phpdocumentor/type-resolver",
@@ -2257,16 +2241,16 @@
         },
         {
             "name": "symfony/browser-kit",
-            "version": "v3.4.24",
+            "version": "v3.4.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/browser-kit.git",
-                "reference": "c0fadd368c1031109e996316e53ffeb886d37ea1"
+                "reference": "7f2b0843d5045468225f9a9b27a0cb171ae81828"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/c0fadd368c1031109e996316e53ffeb886d37ea1",
-                "reference": "c0fadd368c1031109e996316e53ffeb886d37ea1",
+                "url": "https://api.github.com/repos/symfony/browser-kit/zipball/7f2b0843d5045468225f9a9b27a0cb171ae81828",
+                "reference": "7f2b0843d5045468225f9a9b27a0cb171ae81828",
                 "shasum": ""
             },
             "require": {
@@ -2310,11 +2294,11 @@
             ],
             "description": "Symfony BrowserKit Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-23T15:06:07+00:00"
+            "time": "2019-04-06T19:33:58+00:00"
         },
         {
             "name": "symfony/console",
-            "version": "v2.8.49",
+            "version": "v2.8.50",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
@@ -2375,7 +2359,7 @@
         },
         {
             "name": "symfony/css-selector",
-            "version": "v3.4.24",
+            "version": "v3.4.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
@@ -2485,7 +2469,7 @@
         },
         {
             "name": "symfony/dom-crawler",
-            "version": "v3.4.24",
+            "version": "v3.4.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dom-crawler.git",
@@ -2542,7 +2526,7 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v3.4.24",
+            "version": "v3.4.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
@@ -2605,16 +2589,16 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v3.4.24",
+            "version": "v3.4.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "fcdde4aa38f48190ce70d782c166f23930084f9b"
+                "reference": "61af5ce0b34b942d414fe8f1b11950d0e9a90e98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/fcdde4aa38f48190ce70d782c166f23930084f9b",
-                "reference": "fcdde4aa38f48190ce70d782c166f23930084f9b",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/61af5ce0b34b942d414fe8f1b11950d0e9a90e98",
+                "reference": "61af5ce0b34b942d414fe8f1b11950d0e9a90e98",
                 "shasum": ""
             },
             "require": {
@@ -2650,7 +2634,7 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2019-02-22T14:44:53+00:00"
+            "time": "2019-04-02T19:54:57+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -2771,25 +2755,25 @@
         },
         {
             "name": "symfony/process",
-            "version": "v4.2.5",
+            "version": "v3.4.27",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "1e6cbb41dadcaf29e0db034d6ad0d039a9df06e6"
+                "reference": "a9c4dfbf653023b668c282e4e02609d131f4057a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/1e6cbb41dadcaf29e0db034d6ad0d039a9df06e6",
-                "reference": "1e6cbb41dadcaf29e0db034d6ad0d039a9df06e6",
+                "url": "https://api.github.com/repos/symfony/process/zipball/a9c4dfbf653023b668c282e4e02609d131f4057a",
+                "reference": "a9c4dfbf653023b668c282e4e02609d131f4057a",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1.3"
+                "php": "^5.5.9|>=7.0.8"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "4.2-dev"
+                    "dev-master": "3.4-dev"
                 }
             },
             "autoload": {
@@ -2816,7 +2800,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2019-03-10T20:07:02+00:00"
+            "time": "2019-04-08T16:15:54+00:00"
         },
         {
             "name": "symfony/yaml",
@@ -2928,6 +2912,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "spoje.net/flexipeehp": 20,
         "vitexsoftware/ease-bricks": 20
     },
     "prefer-stable": false,
