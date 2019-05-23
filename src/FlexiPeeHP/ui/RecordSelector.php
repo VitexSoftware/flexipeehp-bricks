@@ -15,17 +15,18 @@ namespace FlexiPeeHP\ui;
  */
 class RecordSelector extends \Ease\Html\SelectTag
 {
+
     use \Ease\ui\Selectizer;
 
     /**
      * Selectize.js based input
      * 
      * @param string                 $name
-     * @param array                  $values
+     * @param string                 $value
      * @param \FlexiPeeHP\FlexiBeeRO $optionsEngine
      * @param array                  $properties
      */
-    public function __construct($name, $values, $optionsEngine,
+    public function __construct($name, $value, $optionsEngine,
                                 $properties = array())
     {
         if (empty($optionsEngine->getColumnInfo('nazev'))) {
@@ -40,14 +41,16 @@ class RecordSelector extends \Ease\Html\SelectTag
             $keyColumn = 'kod';
         }
 
-        parent::__construct($name, $values, $properties);
-        $values = $optionsEngine->getColumnsFromFlexibee([$keyColumn, $nameColumn]);
-        if ($keyColumn == 'kod') {
-            foreach ($values as $id => $valueRow) {
-                $values[$id][$nameColumn] = $values[$id][$keyColumn].': '.$values[$id][$nameColumn];
-            }
+        $values  = $optionsEngine->getColumnsFromFlexibee([$keyColumn, $nameColumn]);
+        $options = [];
+
+        foreach ($values as $id => $valuesRow) {
+            $options[$values[$id][$keyColumn]] = $values[$id][$nameColumn];
         }
-        
-        $this->selectize( ['valueField' => $keyColumn, 'labelField' => $nameColumn, 'searchField' => ['kod', 'nazev'], 'create' => false  ],$values );
+
+        parent::__construct($name, $options, $value, [], $properties);
+
+        $this->selectize(['valueField' => $keyColumn, 'labelField' => $nameColumn,
+            'searchField' => ['kod', 'nazev'], 'create' => false]);
     }
 }
