@@ -135,7 +135,6 @@ class Convertor extends \Ease\Sand
                             }
                         }
 
-
                         $polozkyDokladu                = new \FlexiPeeHP\FakturaVydanaPolozka();
                         $itemColnames                  = array_keys($polozkyDokladu->getColumnsInfo());
                         $this->rules['polozkyFaktury'] = self::removeRoColumns(array_combine($itemColnames,
@@ -168,6 +167,7 @@ class Convertor extends \Ease\Sand
     {
         if ($handleAccountig === false) {
             unset($this->rules['ucetni']);
+            unset($this->rules['clenDph']);
         }
         $this->convertItems($keepId, $addExtId, $keepCode, $handleAccountig);
     }
@@ -243,7 +243,8 @@ class Convertor extends \Ease\Sand
         foreach (self::removeRoColumns($this->rules, $this->output) as $columnToTake => $subitemColumns) {
             if (is_array($subitemColumns)) {
                 if (!empty($this->input->getSubItems())) {
-                    $this->convertSubitems($columnToTake, $keepId, $keepCode,$handleAccounting);
+                    $this->convertSubitems($columnToTake, $keepId, $keepCode,
+                        $handleAccounting);
                 }
             } else {
                 $this->output->setDataValue($columnToTake,
