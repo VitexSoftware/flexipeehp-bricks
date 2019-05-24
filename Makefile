@@ -4,6 +4,7 @@ clean:
 	rm -rf debian/*.log
 	rm -rf debian/*.substvars
 	rm -rf docs/*
+	rm -rf vendor/* composer.lock
 
 doc:
 	VERSION=`cat debian/composer.json | grep version | awk -F'"' '{print $$4}'`; \
