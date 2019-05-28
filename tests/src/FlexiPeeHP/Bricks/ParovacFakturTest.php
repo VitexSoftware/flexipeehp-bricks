@@ -23,20 +23,8 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function makeInvoice($initialData = [])
     {
-        $yesterday = new \DateTime();
-        $yesterday->modify('-1 day');
-        $testCode  = 'TEST_'.\Ease\Sand::randomString();
-        $invoice   = new \FlexiPeeHP\FakturaVydana();
-        $invoice->takeData(array_merge([
-            'kod' => $testCode,
-            'varSym' => 123,
-            'specSym' => 456,
-            'popis' => 'FlexiPeeHP-Bricks Unit Test',
-            'datVyst' => \FlexiPeeHP\FlexiBeeRO::dateToFlexiDate($yesterday),
-            'typDokl' => \FlexiPeeHP\FlexiBeeRO::code('FAKTURA')
-                ], $initialData));
-        $invoice->sync();
-        return $invoice;
+        return \Test\FlexiPeeHP\FakturaVydanaTest::makeTestInvoice($initialData,
+                1, 'vydana');
     }
 
     /**
@@ -48,32 +36,14 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function makePayment($initialData = [])
     {
-        $yesterday = new \DateTime();
-        $yesterday->modify('-1 day');
-
-        $testCode = 'TEST_'.\Ease\Sand::randomString();
-
-        $payment = new \FlexiPeeHP\Banka($initialData);
-
-        $payment->takeData(array_merge([
-            'kod' => $testCode,
-            'banka' => 'code:HLAVNI',
-            'typPohybuK' => 'typPohybu.prijem',
-            'varSym' => 123,
-            'specSym' => 456,
-            'datVyst' => \FlexiPeeHP\FlexiBeeRO::dateToFlexiDate($yesterday),
-            'typDokl' => \FlexiPeeHP\FlexiBeeRO::code('STANDARD')
-                ], $initialData));
-        $payment->sync();
-
-        return $payment;
+        return \Test\FlexiPeeHP\BankaTest::makeTestPayment($initialData,1);
     }
 
     /**
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->object = new ParovacFaktur(["LABEL_PREPLATEK" => 'PREPLATEK', "LABEL_CHYBIFAKTURA" => 'CHYBIFAKTURA',
             "LABEL_NEIDENTIFIKOVANO" => 'NEIDENTIFIKOVANO']);
@@ -83,14 +53,14 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown()
+    protected function tearDown(): void
     {
         
     }
 
     public function testGetDocumentTypes()
     {
-//        $this->assertArrayHasKey('FAKTURA', $this->object->getDocumentTypes());
+        $this->assertArrayHasKey('FAKTURA', $this->object->getDocumentTypes());
     }
 
     /**
@@ -144,7 +114,7 @@ class ParovacFakturTest extends \Test\Ease\SandTest
         $paymentsToCheck = $this->object->getPaymentsToProcess(1);
         $this->object->outInvoicesMatchingByBank();
         foreach ($paymentsToCheck as $paymentID => $paymentData) {
-            $paymentChecker->loadFromFlexiBee($paymentID);
+            $paymentChecker->loadFromFlexiBee(\FlexiPeeHP\FlexiBeeRO::code($paymentData['kod']));
             $this->assertEquals('true',
                 $paymentChecker->getDataValue('sparovano'), 'Matching error');
         }
@@ -155,14 +125,26 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function testInvoicesMatchingByInvoices()
     {
+
+        $faktura  = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('FAKTURA'),
+            'popis' => 'InvoicesMatchingByInvoices FlexiPeeHP-Bricks Test']);
+        $zaloha   = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ZÁLOHA'),
+            'popis' => 'InvoicesMatchingByInvoices FlexiPeeHP-Bricks Test']);
+        $dobropis = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('DOBROPIS'),
+            'popis' => 'InvoicesMatchingByInvoices FlexiPeeHP-Bricks Test']);
+
         $invoiceChecker  = new \FlexiPeeHP\FakturaVydana(null,
             ['detail' => 'custom:sparovano']);
         $invoicesToCheck = $this->object->getPaymentsToProcess(1);
-        $this->object->invoicesMatchingByInvoices();
-        foreach ($invoicesToCheck as $paymentID => $paymentData) {
-            $invoiceChecker->loadFromFlexiBee($paymentID);
-            $this->assertEquals('true',
-                $invoiceChecker->getDataValue('sparovano'), 'Matching error');
+        if (empty($invoicesToCheck)) {
+            $this->markTestSkipped(_('No invoices to Process. Please run '));
+        } else {
+            $this->object->invoicesMatchingByInvoices();
+            foreach ($invoicesToCheck as $paymentID => $paymentData) {
+                $invoiceChecker->loadFromFlexiBee($paymentID);
+                $this->assertEquals('true',
+                    $invoiceChecker->getDataValue('sparovano'), 'Matching error');
+            }
         }
     }
 
@@ -174,7 +156,8 @@ class ParovacFakturTest extends \Test\Ease\SandTest
         $dobropis = $this->makeInvoice(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ODD'),
             'popis' => 'Test SettleCreditNote FlexiPeeHP-Bricks']);
         $payment  = $this->makePayment();
-        $this->object->settleCreditNote($dobropis, $payment);
+        $this->assertEquals(1,
+            $this->object->settleCreditNote($dobropis, $payment));
     }
 
     /**
@@ -213,7 +196,15 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function testHotfixDeductionOfAdvances()
     {
-        $this->object->hotfixDeductionOfAdvances();
+        $varSym = \Ease\Sand::randomNumber(1111, 9999);
+        $price  = \Ease\Sand::randomNumber(11, 99);
+
+
+        $invoice = $this->makeInvoice(['typDokl' => 'code:ZDD', 'varSym' => $varSym,
+            'sumZklZakl' => $price]);
+        $payment = $this->makePayment(['varSym' => $varSym, 'sumZklZakl' => $price]);
+
+        $this->object->hotfixDeductionOfAdvances($invoice, $payment);
     }
 
     /**
@@ -221,6 +212,9 @@ class ParovacFakturTest extends \Test\Ease\SandTest
      */
     public function testFindInvoices()
     {
+        $this->makeInvoice(['varSym' => '123', 'poznam' => 'Test FindInvoices FlexiPeeHP-Bricks']);
+        $this->makeInvoice(['specSym' => '356', 'poznam' => 'Test FindInvoices FlexiPeeHP-Bricks']);
+
         $this->object->findInvoices(['id' => '1', 'varSym' => '123']);
         $this->object->findInvoices(['id' => '2', 'specSym' => '356']);
     }
