@@ -8,6 +8,7 @@
             "email": "info@vitexsoftware.cz"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
         "spoje.net/flexipeehp": "dev-master",
         "vitexsoftware/ease-bricks": "dev-master"
