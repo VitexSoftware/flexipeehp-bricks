@@ -28,7 +28,7 @@ class StatusInfoBox extends \FlexiPeeHP\Company
     {
         parent::__construct($init, $properites);
         $infoRaw = $this->getFlexiData();
-        if (count($infoRaw) && !array_key_exists('success', $infoRaw)) {
+        if (!empty($infoRaw) && !array_key_exists('success', $infoRaw)) {
             $this->info = $this->reindexArrayBy($infoRaw, 'dbNazev');
         }
     }
