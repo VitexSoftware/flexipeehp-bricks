@@ -33,6 +33,25 @@ class ConvertorTest extends \Test\Ease\SandTest
     }
 
     /**
+     * Test Constructor
+     *
+     * @covers FlexiPeeHP\Bricks\Convertor::__construct
+     */
+    public function testConstructor()
+    {
+        $classname = get_class($this->object);
+        $evidence  = $this->object->getEvidence();
+
+        // Get mock, without the constructor being called
+        $mock = $this->getMockBuilder($classname)
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $mock->__construct(new \FlexiPeeHP\FakturaVydana(),new \FlexiPeeHP\FakturaPrijata());
+    }
+    
+    
+    
+    /**
      * @covers FlexiPeeHP\Bricks\Convertor::setSource
      */
     public function testSetSource()

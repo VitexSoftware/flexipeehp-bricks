@@ -7,8 +7,8 @@ Priority: optional
 Homepage: https://github.com/VitexSoftware/FlexiPeeHP-Bricks
 
 Package: flexipeehp-bricks
-Depends: ${misc:Depends},flexipeehp (>= 1.20.1)
-Suggests: composer,flexipeehp-doc,flexipeehp-bricks-doc
+Depends: ${misc:Depends},php-flexibee (>= 1.20.1)
+Suggests: composer,php-flexibee-doc,flexipeehp-bricks-doc
 Architecture: all
 Section: web
 Priority: optional

@@ -16,6 +16,7 @@
     "autoload": {
         "psr-4": {
             "FlexiPeeHP\\Bricks\\": "src/FlexiPeeHP/Bricks",
+            "FlexiPeeHP\\Bricks\\ConvertRules\\": "src/FlexiPeeHP/Bricks/ConvertRules",
             "FlexiPeeHP\\ui\\": "src/FlexiPeeHP/ui"
         }
     },
