@@ -147,14 +147,10 @@ class Convertor extends \Ease\Sand
      * Convert FlexiBee documnet's subitems
      * 
      * @param string  $columnToTake   usually "polozkyDokladu"
-     * @param boolean $keepId         keep item IDs
-     * @param boolean $keepCode       keep items code
-     * @param boolean $keepAccounting set item's "ucetni" like target 
      */
-    public function convertSubitems($columnToTake, $keepId = false,
-                                    $keepCode = false, $keepAccountig = false)
+    public function convertSubitems($columnToTake)
     {
-        $subitemRules = $this->rules[$columnToTake];
+        $subitemRules = $this->rules->getRuleForColumn($columnToTake);
         if (self::isAssoc($this->input->data[$columnToTake])) {
             $sourceData = [$this->input->data[$columnToTake]];
         } else {
@@ -165,47 +161,33 @@ class Convertor extends \Ease\Sand
 
         foreach ($sourceData as $subItemData) {
             foreach (array_keys($subItemData) as $subitemColumn) {
-                if (!array_key_exists($subitemColumn, $subitemRules)) {
-                    unset($subItemData[$subitemColumn]);
+                if(array_key_exists($subitemColumn,$subitemRules)){
+                    if (strstr($subitemRules[$subitemColumn], '()')) {
+                        $subItemData[$subitemColumn] = call_user_func(array($this->rules, str_replace('()', '',
+                                $subitemRules[$subitemColumn])),$sourceData[$subitemColumn]);
+                    } else {
+                        $subItemData[$subitemColumn] =  $sourceData[$subItemRules[$subitemColumn]] ;
+                    }
                 }
+                
             }
 
-            if ($keepAccountig && array_key_exists('ucetni', $subItemData) && array_key_exists('ucetni',
-                    $this->output->getData())) {
-                $subItemData['ucetni'] = $this->output->getDataValue('ucetni');
-            } else {
-                unset($subItemData['ucetni']);
-            }
-
-            if ($typUcOp) {
-                $subItemData['typUcOp'] = $typUcOp;
-            } else {
-                unset($subItemData['typUcOp']);
-            }
-
-            if ($keepCode === false) {
-                unset($subItemData['kod']);
-            }
-            if ($keepId === false) {
-                unset($subItemData['id']);
-                unset($subItemData['external-ids']);
-            }
             $this->output->addArrayToBranch($subItemData);
         }
     }
 
     public function convertItems()
     {
-
-        foreach ($this->rules->getRules() as $columnToTake => $subitemColumns) {
+        $convertRules = $this->rules->getRules();
+        foreach ($convertRules as $columnToTake => $subitemColumns) {
             if (is_array($subitemColumns)) {
                 if (!empty($this->input->getSubItems())) {
-                    $this->convertSubitems($columnToTake, $keepId, $keepCode,
-                        $handleAccounting);
+                    $this->convertSubitems($columnToTake);
                 }
             } else {
                 if (strstr($subitemColumns, '()')) {
-                      call_user_func(array( $this->rules , str_replace('()','',$subitemColumns )));
+                    $this->output->setDataValue($columnToTake,call_user_func(array($this->rules, str_replace('()', '',
+                            $subitemColumns)),$this->input->getDataValue($subitemColumns)));
                 } else {
                     $this->output->setDataValue($columnToTake,
                         $this->input->getDataValue($subitemColumns));
