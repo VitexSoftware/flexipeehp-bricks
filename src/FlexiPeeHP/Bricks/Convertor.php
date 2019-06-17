@@ -156,26 +156,25 @@ class Convertor extends \Ease\Sand
         } else {
             $sourceData = $this->input->getDataValue($columnToTake);
         }
-
-        $typUcOp = $this->input->getDataValue('typUcOp');
-
-        foreach ($sourceData as $subItemData) {
+        $subItemCopyData = [];
+        foreach ($sourceData as  $subitemPos => $subItemData) {
             foreach (array_keys($subItemData) as $subitemColumn) {
                 if(array_key_exists($subitemColumn,$subitemRules)){
                     if (strstr($subitemRules[$subitemColumn], '()')) {
-                        $subItemData[$subitemColumn] = call_user_func(array($this->rules, str_replace('()', '',
-                                $subitemRules[$subitemColumn])),$sourceData[$subitemColumn]);
+                        $subItemCopyData[$subitemColumn] = call_user_func(array($this->rules, str_replace('()', '',
+                                $subitemRules[$subitemColumn])),$sourceData[$subitemPos][$subitemColumn]);
                     } else {
-                        $subItemData[$subitemColumn] =  $sourceData[$subItemRules[$subitemColumn]] ;
+                        $subItemCopyData[$subitemColumn] =  $sourceData[$subitemPos][$subitemRules[$subitemColumn]] ;
                     }
                 }
-                
             }
-
-            $this->output->addArrayToBranch($subItemData);
+            $this->output->addArrayToBranch($subItemCopyData);
         }
     }
 
+    /**
+     * convert main document items
+     */
     public function convertItems()
     {
         $convertRules = $this->rules->getRules();
