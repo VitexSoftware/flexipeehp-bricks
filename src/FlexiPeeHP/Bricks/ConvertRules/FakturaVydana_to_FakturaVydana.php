@@ -13,7 +13,7 @@ class FakturaVydana_to_FakturaVydana extends \FlexiPeeHP\Bricks\ConvertorRule
         'kod' => 'kod',
 //        'cisDosle' => 'cisDosle',
         'varSym' => 'varSym',
-//        'cisSml' => 'cisSml',
+        'cisSml' => 'cisSml',
 //        'cisObj' => 'cisObj',
 //        'datObj' => 'datObj',
 //        'cisDodak' => 'cisDodak',

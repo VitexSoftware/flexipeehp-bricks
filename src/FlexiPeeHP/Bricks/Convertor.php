@@ -36,11 +36,13 @@ class Convertor extends \Ease\Sand
     /**
      * Convertor 
      * 
-     * @param \FlexiPeeHP\FlexiBeeRO $input
-     * @param \FlexiPeeHP\FlexiBeeRW $output
+     * @param \FlexiPeeHP\FlexiBeeRO $input   Source 
+     * @param \FlexiPeeHP\FlexiBeeRW $output  Destination
+     * @param ConvertorRule          $ruler   force convertor rule class
      */
     public function __construct(\FlexiPeeHP\FlexiBeeRO $input = null,
-                                \FlexiPeeHP\FlexiBeeRW $output = null)
+                                \FlexiPeeHP\FlexiBeeRW $output = null,
+                                $ruler = null )
     {
         parent::__construct();
         if (!empty($input)) {
@@ -49,6 +51,10 @@ class Convertor extends \Ease\Sand
         if (!empty($output)) {
             $this->setDestination($output);
         }
+        if(is_object($ruler)){
+            $this->rules = $ruler;
+        }
+        
     }
 
     /**
