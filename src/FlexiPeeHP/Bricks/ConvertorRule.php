@@ -33,7 +33,7 @@ class ConvertorRule extends \Ease\Sand
      * @param boolean $keepCode
      * @param boolean $handleAccounting set columns "ucetni" like target or ignore it
      */
-    public function __construct(Convertor &$convertor, $keepId = false,
+    public function __construct(Convertor &$convertor = null, $keepId = false,
                                 $addExtId = false, $keepCode = false,
                                 $handleAccounting = true)
     {
@@ -43,7 +43,9 @@ class ConvertorRule extends \Ease\Sand
         $this->addExtId = $addExtId;
         $this->keepCode = $keepCode;
 
-        $this->convertor = &$convertor;
+        if ($convertor) {
+            $this->assignConvertor($convertor);
+        }
 
         if ($keepId === false) {
             unset($this->rules['id']);
@@ -59,6 +61,15 @@ class ConvertorRule extends \Ease\Sand
 //            unset($this->rules['ucetni']);
 //            unset($this->rules['clenDph']);
         }
+    }
+
+    /**
+     * 
+     * @param Convertor $convertor
+     */
+    public function assignConvertor(Convertor &$convertor)
+    {
+        $this->convertor = &$convertor;
     }
 
     public function addExtId()

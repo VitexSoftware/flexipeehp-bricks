@@ -42,7 +42,7 @@ class Convertor extends \Ease\Sand
      */
     public function __construct(\FlexiPeeHP\FlexiBeeRO $input = null,
                                 \FlexiPeeHP\FlexiBeeRW $output = null,
-                                $ruler = null )
+                                $ruler = null)
     {
         parent::__construct();
         if (!empty($input)) {
@@ -51,10 +51,10 @@ class Convertor extends \Ease\Sand
         if (!empty($output)) {
             $this->setDestination($output);
         }
-        if(is_object($ruler)){
+        if (is_object($ruler)) {
             $this->rules = $ruler;
+            $this->rules->assignConvertor($this);
         }
-        
     }
 
     /**
@@ -163,14 +163,16 @@ class Convertor extends \Ease\Sand
             $sourceData = $this->input->getDataValue($columnToTake);
         }
         $subItemCopyData = [];
-        foreach ($sourceData as  $subitemPos => $subItemData) {
+        foreach ($sourceData as $subitemPos => $subItemData) {
             foreach (array_keys($subItemData) as $subitemColumn) {
-                if(array_key_exists($subitemColumn,$subitemRules)){
+                if (array_key_exists($subitemColumn, $subitemRules)) {
                     if (strstr($subitemRules[$subitemColumn], '()')) {
-                        $subItemCopyData[$subitemColumn] = call_user_func(array($this->rules, str_replace('()', '',
-                                $subitemRules[$subitemColumn])),$sourceData[$subitemPos][$subitemColumn]);
+                        $subItemCopyData[$subitemColumn] = call_user_func(array(
+                            $this->rules, str_replace('()', '',
+                                $subitemRules[$subitemColumn])),
+                            $sourceData[$subitemPos][$subitemColumn]);
                     } else {
-                        $subItemCopyData[$subitemColumn] =  $sourceData[$subitemPos][$subitemRules[$subitemColumn]] ;
+                        $subItemCopyData[$subitemColumn] = $sourceData[$subitemPos][$subitemRules[$subitemColumn]];
                     }
                 }
             }
@@ -190,12 +192,16 @@ class Convertor extends \Ease\Sand
                     $this->convertSubitems($columnToTake);
                 }
             } else {
-                if (strstr($subitemColumns, '()')) {
-                    $this->output->setDataValue($columnToTake,call_user_func(array($this->rules, str_replace('()', '',
-                            $subitemColumns)),$this->input->getDataValue($subitemColumns)));
-                } else {
-                    $this->output->setDataValue($columnToTake,
-                        $this->input->getDataValue($subitemColumns));
+                if (empty($this->output->getDataValue($columnToTake))) {
+                    if (strstr($subitemColumns, '()')) {
+                        $this->output->setDataValue($columnToTake,
+                            call_user_func(array($this->rules, str_replace('()',
+                                '', $subitemColumns)),
+                                $this->input->getDataValue($subitemColumns)));
+                    } else {
+                        $this->output->setDataValue($columnToTake,
+                            $this->input->getDataValue($subitemColumns));
+                    }
                 }
             }
         }
