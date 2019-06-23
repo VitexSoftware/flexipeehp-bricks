@@ -194,10 +194,11 @@ class Convertor extends \Ease\Sand
             } else {
                 if (empty($this->output->getDataValue($columnToTake))) {
                     if (strstr($subitemColumns, '()')) {
-                        $this->output->setDataValue($columnToTake,
-                            call_user_func(array($this->rules, str_replace('()',
-                                '', $subitemColumns)),
-                                $this->input->getDataValue($subitemColumns)));
+
+                        $functionResult = call_user_func(array($this->rules, str_replace('()','', $subitemColumns)),  $this->input->getDataValue($subitemColumns));
+                        
+                        $this->output->setDataValue($columnToTake,  $functionResult  );
+                        
                     } else {
                         $this->output->setDataValue($columnToTake,
                             $this->input->getDataValue($subitemColumns));

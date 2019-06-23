@@ -72,22 +72,45 @@ class ConvertorRule extends \Ease\Sand
         $this->convertor = &$convertor;
     }
 
+    /**
+     * 
+     */
     public function addExtId()
     {
         $this->convertor->getOutput()->setDataValue('id',
             'ext:src:'.$this->convertor->getInput()->getEvidence().':'.$this->convertor->getInput()->getMyKey());
     }
 
+    /**
+     * Complied Rules Getter
+     * 
+     * @return array
+     */
     function getRules()
     {
         return $this->rules;
     }
 
+    /**
+     * 
+     * 
+     * @param string $columnName
+     * 
+     * @return string 
+     */
     function getRuleForColumn($columnName)
     {
         return $this->rules[$columnName];
     }
 
+    /**
+     * Convertor Rule Clas  template Generator
+     * 
+     * @param Convertor $convertor
+     * @param string    $className
+     * 
+     * @throws \Ease\Exception
+     */
     public static function convertorClassTemplateGenerator($convertor,
                                                            $className)
     {
