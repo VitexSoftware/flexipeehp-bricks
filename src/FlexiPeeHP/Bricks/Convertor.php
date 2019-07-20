@@ -120,6 +120,7 @@ class Convertor extends \Ease\Sand
         if (class_exists($ruleClass, true)) {
             $this->rules = new $ruleClass($this, $keepId, $addExtId, $keepCode,
                 $handleAccounting);
+            $this->rules->assignConvertor($this);
         } else {
             if ($this->debug) {
                 ConvertorRule::convertorClassTemplateGenerator($this,
@@ -182,6 +183,8 @@ class Convertor extends \Ease\Sand
 
     /**
      * convert main document items
+     * 
+     * @return boolean conversion success
      */
     public function convertItems()
     {
@@ -194,11 +197,10 @@ class Convertor extends \Ease\Sand
             } else {
                 if (empty($this->output->getDataValue($columnToTake))) {
                     if (strstr($subitemColumns, '()')) {
-
-                        $functionResult = call_user_func(array($this->rules, str_replace('()','', $subitemColumns)),  $this->input->getDataValue($subitemColumns));
-                        
-                        $this->output->setDataValue($columnToTake,  $functionResult  );
-                        
+                        $functionResult = call_user_func(array($this->rules, str_replace('()','', $subitemColumns)),  $this->input->getDataValue($columnToTake));
+                        if(!is_null($functionResult)){
+                            $this->output->setDataValue($columnToTake,  $functionResult  );
+                        }
                     } else {
                         $this->output->setDataValue($columnToTake,
                             $this->input->getDataValue($subitemColumns));
@@ -206,6 +208,7 @@ class Convertor extends \Ease\Sand
                 }
             }
         }
+        return $this->rules->finalizeConversion();
     }
 
     /**

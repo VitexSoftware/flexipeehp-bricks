@@ -31,13 +31,13 @@ class Banka_to_FakturaVydana extends \FlexiPeeHP\Bricks\ConvertorRule
 //        'sumOsv' => 'sumOsv',
 //        'sumZklSniz' => 'sumZklSniz',
 //        'sumZklSniz2' => 'sumZklSniz2',
-//        'sumZklZakl' => 'sumZklZakl',
+//        'sumZklZakl' => 'sumZklZakl()',
 //        'sumDphSniz' => 'sumDphSniz',
 //        'sumDphSniz2' => 'sumDphSniz2',
 //        'sumDphZakl' => 'sumDphZakl',
 //        'sumCelkSniz' => 'sumCelkSniz',
 //        'sumCelkSniz2' => 'sumCelkSniz2',
-//        'sumCelkZakl' => 'sumCelkZakl',
+        'sumCelkZakl' => 'sumCelkZakl()',
 //        'sumCelkem' => 'sumCelkem',
 //        'sumOsvMen' => 'sumOsvMen',
 //        'sumZklSnizMen' => 'sumZklSnizMen',
@@ -238,4 +238,16 @@ class Banka_to_FakturaVydana extends \FlexiPeeHP\Bricks\ConvertorRule
         ],
     ];
 
+    /**
+     * Actions performed after converting process
+     * 
+     * @return boolean
+     */
+    public function sumCelkZakl($inPrice)
+    {
+        if(empty($this->convertor->getInput()->getSubitems())){
+            $this->convertor->getOutput()->addArrayToBranch(['typCenyDphK'=>'typCeny.sDph', 'cenaMj' => floatval($inPrice)]);
+        }
+        return null;
+    }
 }
