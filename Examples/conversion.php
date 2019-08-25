@@ -49,13 +49,22 @@ function makePayment($initialData = [], $dayBack = 1)
 }
 
 
-\Ease\Shared::instanced()->loadConfig(dirname(__DIR__).'/tests/client.json');
+\Ease\Shared::instanced()->loadConfig(dirname(__DIR__).'/tests/client.json',true);
 
 $prijem = makePayment();
 $zdd = new FlexiPeeHP\FakturaVydana(['typDokl' => \FlexiPeeHP\FlexiBeeRO::code('ZDD')]);
 
 $engine = new FlexiPeeHP\Bricks\Convertor($prijem,$zdd);
-$zdd = $engine->conversion();
-
+$zdd = $engine->conversion(false,true);
 print_r($zdd->getData());
-    
+
+$fakturaVydna = \Test\FlexiPeeHP\FakturaVydanaTest::makeTestInvoice([]);
+$engine2 = new FlexiPeeHP\Bricks\Convertor($fakturaVydna , new \FlexiPeeHP\FakturaPrijata());
+$fakturaPrijata = $engine2->conversion(false,true);
+print_r($fakturaPrijata->getData());
+
+$zaloha = \Test\FlexiPeeHP\FakturaVydanaTest::makeTestInvoice(['typDokl'=>'cod:ZǍLOHA']);
+$engine3 = new FlexiPeeHP\Bricks\Convertor($zaloha , new \FlexiPeeHP\FakturaVydana());
+$danovyDoklad = $engine3->conversion(false,true);
+print_r($danovyDoklad->getData());
+

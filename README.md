@@ -56,10 +56,10 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | ------------------------------------------------------------- | --------------------------------------|
 | [Convertor.php](src/FlexiPeeHP/Bricks/Convertor.php)          | Konvertor dokladů
 | [Customer.php](src/FlexiPeeHP/Bricks/Customer.php)            | Zákazník
+| [GdprLog.php](src/FlexiPeeHP/Bricks/GdprLog.php)              | GDPR Logger s podporou pro FlexiBee
+| [GateKeeper.php](src/FlexiPeeHP/Bricks/GateKeeper.php)        | Kontroluje zdali je shodná firma uživatele a dokladu
 | [HookReciever.php](src/FlexiPeeHP/Bricks/HookReciever.php)    | Příjmač WebHooků
 | [PotvrzeniUhrady.php](src/FlexiPeeHP/Bricks/HookReciever.php) | Třída potvrzující došlou úhradu
-| [Upominac.php](src/FlexiPeeHP/Bricks/HookReciever.php)        | Třída upomínající neplatiče
-| [Upominka.php](src/FlexiPeeHP/Bricks/Upominka.php)            | Třída upomínky pro neplatiče
 | [ParovacFaktur.php](src/FlexiPeeHP/Bricks/ParovacFaktur.php)  | Párovač faktur
 
 # Třídy v FlexiPeeHP/Bricks/ui:
@@ -67,15 +67,22 @@ Zatím několik málo praktických ukázek určený k použití ve vašich aplik
 | Soubor                                                        | Popis                                 |
 | ------------------------------------------------------------- | --------------------------------------|
 | [AdresarForm.php](src/FlexiPeeHP/Bricks/ui/AdresarForm.php)   | Editační formulář adresy
+| [CompanyLogo.php](src/FlexiPeeHP/Bricks/ui/CompanyLogo.php)   | Logo Firmy
+| [FlexiBeeLogo.php](src/FlexiPeeHP/Bricks/ui/FlexiBeeLogo.php) | Logo FlexiBee
 | [KontaktForm.php](src/FlexiPeeHP/Bricks/ui/KontaktForm.php)   | Editační formulář kontaktu adresy
 | [EmbedResponsiveHTML.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsiveHTML.php)| Třída pro zobrazení HTML dokumentu na stránce 
 | [EmbedResponsivePDF.php](src/FlexiPeeHP/Bricks/ui/EmbedResponsivePDF.php)  | Třída pro zobrazení PDF dokumentu na stránce 
 | [RecordTypeSelect.php](src/FlexiPeeHP/Bricks/ui/RecordTypeSelect.php)      | Nabídka pro výběr typu dokumnetu 
+| [RecordChooser.php](src/FlexiPeeHP/Bricks/ui/RecordChooser.php)            | Nabídka pro výběr záznamu zaleožený na [Selectize.js](https://selectize.github.io/selectize.js/)
 | [StatusInfoBox.php](src/FlexiPeeHP/Bricks/ui/StatusInfoBox.php)            | Info widget o stavu připojení
 
 
 Ukázky ve složce [Examples](Examples)
 =====================================
+
+Logo Firmy: [companylogo.php](Examples/companylogo.php)
+
+![Logo](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/companylogo.png)
 
 Editor Adresy: [addresseditor.php](Examples/addresseditor.php)
 
@@ -95,6 +102,10 @@ Formulář pro zadání přihlašovacích údajů FlexiBee a zobrazení zdali by
 
 ![Test Připojení](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/statussignin.png)
 
+
+Instalátor uživatelských tlačítek [buttonInstaller](src/buttonInstaller.php)
+
+![Custom Button Installer](https://raw.githubusercontent.com/VitexSoftware/FlexiPeeHP-Bricks/master/Examples/buttoninstaller.png)
 
 Debian/Ubuntu
 -------------

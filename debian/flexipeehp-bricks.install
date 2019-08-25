@@ -1,3 +1,4 @@
 src/FlexiPeeHP/Bricks/*.php      /usr/share/php/FlexiPeeHPBricks/Bricks
+src/FlexiPeeHP/Bricks/ConvertRules/*.php      /usr/share/php/FlexiPeeHPBricks/Bricks/ConvertRules
 src/FlexiPeeHP/ui/*.php          /usr/share/php/FlexiPeeHPBricks/ui
 debian/composer.json             /usr/share/php/FlexiPeeHPBricks

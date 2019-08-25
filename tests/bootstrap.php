@@ -10,8 +10,8 @@ if (file_exists('../vendor/autoload.php')) {
 } else {
     require_once 'vendor/autoload.php'; //Create Test
 }
-\Ease\Shared::instanced()->loadConfig('tests/client.json');
-
+\Ease\Shared::instanced()->loadConfig('tests/client.json',true);
+define('EASE_LOGGER', 'syslog');
 /*
 $banka = 'HLAVNI';
 

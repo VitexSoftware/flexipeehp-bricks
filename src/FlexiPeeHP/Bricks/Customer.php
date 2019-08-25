@@ -184,13 +184,71 @@ class Customer extends \Ease\User
             'mena',
             'zamekK',
             'datVyst'],
-            ["(stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND zamekK = 'zamek.otevreno' AND storno eq false AND firma=".$firma],
-            'id');
+            ["datSplat lte '".\FlexiPeeHP\FlexiBeeRW::dateToFlexiDate(new \DateTime())."' AND (stavUhrK is null OR stavUhrK eq 'stavUhr.castUhr') AND storno eq false AND firma=".(is_numeric($firma)
+                    ? $firma : "'".$firma."'" )], 'kod');
 
         if ($this->invoicer->lastResponseCode == 200) {
             $result = $invoices;
         }
         return $result;
+    }
+
+    /**
+     * Obtain Customer "Score"
+     *
+     * @param int $addressID FlexiBee user ID
+     * 
+     * @return int ZewlScore
+     */
+    public function getCustomerScore($addressID)
+    {
+        $score     = 0;
+        $debts     = $this->getCustomerDebts($addressID);
+        $stitkyRaw = $this->adresar->getColumnsFromFlexiBee(['stitky'],
+            ['id' => $addressID]);
+        $stitky    = $stitkyRaw[0]['stitky'];
+        if (!empty($debts)) {
+            foreach ($debts as $did => $debt) {
+                $ddiff = \FlexiPeeHP\FakturaVydana::overdueDays($debt['datSplat']);
+
+                if (($ddiff <= 7) && ($ddiff >= 1)) {
+                    $score = self::maxScore($score, 1);
+                } else {
+                    if (($ddiff > 7 ) && ($ddiff <= 14)) {
+                        $score = self::maxScore($score, 2);
+                    } else {
+                        if ($ddiff > 14) {
+                            $score = self::maxScore($score, 3);
+                        }
+                    }
+                }
+            }
+        }
+        if ($score == 3 && !strstr($stitky, 'UPOMINKA2')) {
+            $score = 2;
+        }
+
+        if (!strstr($stitky, 'UPOMINKA1') && !empty($debts)) {
+            $score = 1;
+        }
+
+        return $score;
+    }
+
+    /**
+     * Overdue group
+     *
+     * @param int $score current score value
+     * @param int $level current level
+     *
+     * @return int max of all levels processed
+     */
+    static private function maxScore($score, $level)
+    {
+        if ($level > $score) {
+            $score = $level;
+        }
+        return $score;
     }
 
     /**

@@ -1,9 +1,9 @@
 {
-    "name": "flexipeehp-bricks",
+    "name": "deb/flexipeehp-bricks",
     "description": "PHP Based Library for easy interaction with czech accounting system Flexibee.",
     "homepage": "https://github.com/VitexSoftware/FlexiPeeHP-Bricks",
     "license": "GPL-2.0+",
-    "version": "0.9",
+    "version": "0.21",
     "type": "library",
     "authors": [
         {
@@ -12,7 +12,8 @@
         }
     ],
     "require": {
-        "flexipeehp": "*"
+        "deb/flexbee": "*",
+        "deb/ease-bricks": "*"
     },
     "autoload": {
         "psr-4": {

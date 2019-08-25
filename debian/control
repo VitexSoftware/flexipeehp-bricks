@@ -7,19 +7,19 @@ Priority: optional
 Homepage: https://github.com/VitexSoftware/FlexiPeeHP-Bricks
 
 Package: flexipeehp-bricks
-Depends: ${misc:Depends},flexipeehp
-Suggests: composer,flexipeehp-doc,flexipeehp-bricks-doc
+Depends: ${misc:Depends},php-flexibee (>= 1.20.1)
+Suggests: composer,php-flexibee-doc,flexipeehp-bricks-doc
 Architecture: all
 Section: web
 Priority: optional
 Description: PHP Based FlexiBee RestAPI/Json library AddOns
  Additional classess and code snipplets for FlexiPeeHP library
 
-Package: flexipeehp-bricks-doc
-Depends: ${misc:Depends}
-Suggests: www-browser
-Architecture: all
-Section: doc
-Priority: optional
-Description: PHP Based FlexiBee RestAPI/Json library Addons documentation
- ApiGen html documentation for FlexiPeeHP Bricks php library
+#Package: flexipeehp-bricks-doc
+#Depends: ${misc:Depends}
+#Suggests: www-browser
+#Architecture: all
+#Section: doc
+#Priority: optional
+#Description: PHP Based FlexiBee RestAPI/Json library Addons documentation
+# ApiGen html documentation for FlexiPeeHP Bricks php library

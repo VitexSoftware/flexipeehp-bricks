@@ -129,7 +129,7 @@ class HookReciever extends \FlexiPeeHP\Changes
                 $this->globalVersion = intval($changes['winstrom']['@globalVersion']);
                 $this->changes       = $changes['winstrom']['changes'];
             }
-            $result = $this->globalVersion;
+            $result = is_numeric($changes['winstrom']['next']) ? $changes['winstrom']['next']-1 : $this->globalVersion;
         }
         return $result;
     }
