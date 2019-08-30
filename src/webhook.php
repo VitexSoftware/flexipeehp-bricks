@@ -16,4 +16,4 @@ include_once './common.php';
 
 $hooker = new HookReciever();
 $hooker->takeChanges($hooker->listen());
-$hooker->processChanges();
+$hooker->processFlexiBeeChanges();

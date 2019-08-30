@@ -228,14 +228,6 @@ class ParovacFakturTest extends \Test\Ease\SandTest
         $this->object->findPayments(['specSym' => '356']);
     }
 
-    /**
-     * @covers FlexiPeeHP\Bricks\ParovacFaktur::findInvoice
-     */
-    public function testFindInvoice()
-    {
-        $found = $this->object->findInvoice(['varSym' => 123]);
-        $found = $this->object->findInvoice(['specSym' => 456]);
-    }
 
     /**
      * @covers FlexiPeeHP\Bricks\ParovacFaktur::findPayment

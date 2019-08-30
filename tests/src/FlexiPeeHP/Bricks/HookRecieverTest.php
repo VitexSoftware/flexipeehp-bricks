@@ -72,7 +72,7 @@ class HookRecieverTest extends \Test\FlexiPeeHP\ChangesTest
      */
     public function testProcessChanges()
     {
-        $this->object->processChanges();
+        $this->object->processFlexiBeeChanges();
         $globalVersion = self::getFakeChangeId();
         $changes       = $this->object->listen('tests/changes.json');
         foreach ($changes['winstrom']['changes'] as $chPos => $change) {
@@ -80,7 +80,7 @@ class HookRecieverTest extends \Test\FlexiPeeHP\ChangesTest
         }
         $changes['winstrom']['@globalVersion'] = $globalVersion;
         $this->object->takeChanges($changes);
-        $this->object->processChanges();
+        $this->object->processFlexiBeeChanges();
     }
 
     /**
@@ -92,6 +92,6 @@ class HookRecieverTest extends \Test\FlexiPeeHP\ChangesTest
         $this->object->saveLastProcessedVersion('X');
         $fchid = self::getFakeChangeId();
         $this->object->saveLastProcessedVersion($fchid);
-        $this->assertEquals($fchid, $this->object->getLastProcessedVersion());
+        $this->assertEquals($fchid, $this->object->getLastCachedVersion());
     }
 }

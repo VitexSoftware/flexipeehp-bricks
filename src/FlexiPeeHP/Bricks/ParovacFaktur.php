@@ -752,21 +752,8 @@ class ParovacFaktur extends \Ease\Sand
 
     /**
      * 
-     * 
-     * @param FakturaVydana $invoice ZDD
-     * @param Banka         $payment Income
-     * 
-     * @return type
-     */
-    function hotfixDeductionOfAdvances($invoice, $payment)
-    {
-        return $this->vytvorVazbuZDD($paymentData, $invoiceId);
-    }
-
-    /**
-     * 
      * @param array $vInvoices new invoices
-     * @param array $invoices current invoices
+     * @param array $invoices  current invoices
      */
     static public function unifyInvoices($vInvoices, &$invoices)
     {
