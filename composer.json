@@ -8,6 +8,7 @@
             "email": "info@vitexsoftware.cz"
         }
     ],
+    "license": "MIT",
     "minimum-stability": "dev",
     "require": {
         "spoje.net/flexipeehp": "dev-master",
