@@ -18,7 +18,7 @@ class ConvertorTest extends \Test\Ease\SandTest
      * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->object = new Convertor();
     }
@@ -27,7 +27,7 @@ class ConvertorTest extends \Test\Ease\SandTest
      * Tears down the fixture, for example, closes a network connection.
      * This method is called after a test is executed.
      */
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         
     }
@@ -40,17 +40,14 @@ class ConvertorTest extends \Test\Ease\SandTest
     public function testConstructor()
     {
         $classname = get_class($this->object);
-        $evidence  = $this->object->getEvidence();
-
-        // Get mock, without the constructor being called
-        $mock = $this->getMockBuilder($classname)
+        $mock      = $this->getMockBuilder($classname)
             ->disableOriginalConstructor()
             ->getMockForAbstractClass();
-        $mock->__construct(new \FlexiPeeHP\FakturaVydana(),new \FlexiPeeHP\FakturaPrijata());
+        $mock->__construct(new \FlexiPeeHP\FakturaVydana(),
+            new \FlexiPeeHP\FakturaPrijata());
+        $this->assertEquals($mock->getObjectName());
     }
-    
-    
-    
+
     /**
      * @covers FlexiPeeHP\Bricks\Convertor::setSource
      */

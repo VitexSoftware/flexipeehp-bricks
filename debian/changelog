@@ -1,3 +1,10 @@
+flexipeehp-bricks (0.25) UNRELEASED; urgency=medium
+
+  * New Document Clonvertor and its rules
+  * 
+
+ -- Vítězslav Dvořák <vitex@develoid.jinonice.czf>  Wed, 21 Aug 2019 13:04:15 +0200
+
 flexipeehp-bricks (0.21) UNRELEASED; urgency=medium
 
   * new gatekeeper

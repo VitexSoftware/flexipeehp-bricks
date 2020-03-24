@@ -27,6 +27,7 @@
             "Test\\FlexiPeeHP\\Bricks\\": "testing/FlexiPeeHP/Bricks",
             "Test\\FlexiPeeHP\\ui\\": "testing/FlexiPeeHP/ui",
             "Test\\FlexiPeeHP\\": "vendor/spoje.net/flexipeehp/testing/src/FlexiPeeHP/",
+            "Test\\FlexiPeeHP\\Bricks\\ConvertRules\\": "testing/FlexiPeeHP/Bricks/ConvertRules",            
             "Test\\": "testing/"
         }
     },
